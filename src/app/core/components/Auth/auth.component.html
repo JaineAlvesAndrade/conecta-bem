@@ -1,47 +1,55 @@
 <div class="auth-container">
     <div class="auth-card">
         <header>
-            <img src="assets/logo.png" alt="ConectaBem" class="logo">
-            <h2>{{ isLogin ? 'Bem-vindo de volta!' : 'Crie sua conta' }}</h2>
-            <p>Transforme vidas através do voluntariado</p>
+            <img src="/assets/logo.png" alt="ConectaBem" class="logo">
+            <h2>{{ (isLogin ? 'auth.title.login' : 'auth.title.register') | translate }}</h2>
+            <p>{{ 'auth.subtitle' | translate }}</p>
         </header>
 
-        <form (submit)="onSubmit()">
-
-            <div class="form-group">
-                <label>Tipo de Perfil</label>
-                <select [(ngModel)]="role" name="role">
-                    <option value="VOLUNTARIO">Voluntário</option>
-                    <option value="ORGANIZADOR">Organizador</option>
-                </select>
-            </div>
-
-            @if (!isLogin) {
-            <div class="form-group">
-                <label>Nome Completo</label>
+            <form (submit)="onSubmit()">
+            <div *ngIf="!isLogin" class="form-group">
+                <label>{{ 'auth.label.name' | translate }}</label>
                 <input type="text" [(ngModel)]="name" name="name">
             </div>
-            }
 
             <div class="form-group">
-                <label>E-mail</label>
+                <label>{{ 'auth.label.email' | translate }}</label>
                 <input type="email" [(ngModel)]="email" name="email" required>
             </div>
 
-            <div class="form-group">
-                <label>Senha</label>
-                <input type="password" [(ngModel)]="password" name="password" required>
+            <div class="form-group password-group">
+                <label>{{ 'auth.label.password' | translate }}</label>
+                <div class="password-field">
+                    <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required>
+                    <button type="button" class="eye" (click)="toggleShowPassword()" aria-label="Toggle password visibility">
+                        <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Confirm password only on register -->
+            <div *ngIf="!isLogin" class="form-group password-group">
+                <label>{{ 'auth.label.confirmPassword' | translate }}</label>
+                <div class="password-field">
+                    <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+                    <button type="button" class="eye" (click)="toggleShowConfirm()" aria-label="Toggle confirm password visibility">
+                        <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                </div>
+                <div class="error" *ngIf="confirmPassword && password !== confirmPassword">
+                    {{ 'auth.error.passwordMismatch' | translate }}
+                </div>
             </div>
 
 
             <button type="submit" class="btn-primary">
-                {{ isLogin ? 'Entrar' : 'Cadastrar' }}
+                {{ isLogin ? ('auth.button.login' | translate) : ('auth.button.register' | translate) }}
             </button>
         </form>
 
         <footer>
             <a (click)="isLogin = !isLogin">
-                {{ isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login' }}
+                {{ isLogin ? ('auth.footer.noAccount' | translate) : ('auth.footer.haveAccount' | translate) }}
             </a>
         </footer>
     </div>
