@@ -1,0 +1,14 @@
+{
+  "auth.title.login": "Welcome back!",
+  "auth.title.register": "Create your account",
+  "auth.subtitle": "Transform lives through volunteering",
+  "auth.label.name": "Full Name",
+  "auth.label.password": "Password",
+  "auth.label.confirmPassword": "Confirm password",
+  "auth.error.passwordMismatch": "Passwords do not match",
+  "auth.label.email": "E-mail",
+  "auth.button.login": "Log in",
+  "auth.button.register": "Register",
+  "auth.footer.noAccount": "Don't have an account? Sign up",
+  "auth.footer.haveAccount": "Already have an account? Log in"
+}
