@@ -1,0 +1,38 @@
+<header class="navbar">
+  <div class="navbar__container">
+
+    <a routerLink="/" class="navbar__brand">
+      <mat-icon class="navbar__logo outline">favorite_border</mat-icon>
+      <mat-icon class="navbar__logo filled">favorite</mat-icon>
+      <span>ConectaBem</span>
+    </a>
+
+    <nav class="navbar__nav" [class.navbar__nav--open]="menuOpen">
+      <a routerLink="/" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}"
+        class="navbar__link">
+        Início
+      </a>
+
+      <a routerLink="/eventos"
+        routerLinkActive="active"
+        class="navbar__link">
+        Explorar Eventos
+      </a>
+    </nav>
+
+    <div class="navbar__actions">
+      <a routerLink="/login" class="navbar__link">Entrar</a>
+      <a routerLink="/cadastro" class="btn btn--primary btn--sm">
+        Cadastre-se
+      </a>
+    </div>
+
+    <button class="navbar__hamburger"
+      (click)="toggleMenu()"
+      aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+
+  </div>
+</header>

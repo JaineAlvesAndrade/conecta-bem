@@ -1,0 +1,48 @@
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__content">
+    <h1>Transforme vidas através do voluntariado</h1>
+    <p>Junte-se a nós e faça a diferença na vida de milhares de pessoas. Nossos programas beneficentes conectam voluntários dedicados a causas que realmente importam.</p>
+    <div class="hero__actions">
+      <a routerLink="/cadastro" class="btn btn--primary btn--lg">Torne-se Voluntário</a>
+      <a routerLink="/eventos" class="btn btn--outline btn--lg">Explorar Eventos</a>
+    </div>
+  </div>
+  <div class="hero__image">
+    <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=700&h=500&fit=crop" alt="Voluntários" />
+  </div>
+</section>
+
+<!-- MISSION STATEMENT -->
+<section class="mission">
+  <div class="section-container">
+    <h2>Juntos, construímos um mundo melhor</h2>
+    <p>Nossa missão é conectar pessoas que querem fazer a diferença com organizações que precisam de apoio para transformar comunidades em todo o Brasil.</p>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="section-container">
+    <div class="stats__grid">
+      @for (stat of stats; track stat.label) {
+        <app-stat-card [value]="stat.value" [label]="stat.label" [icon]="stat.icon" />
+      }
+    </div>
+  </div>
+</section>
+
+<!-- PILLARS -->
+<section class="pillars">
+  <div class="section-container">
+    <div class="pillars__grid">
+      @for (pillar of pillars; track pillar.title) {
+        <div class="pillar">
+          <div class="pillar__icon" [innerHTML]="pillar.icon"></div>
+          <h3>{{ pillar.title }}</h3>
+          <p>{{ pillar.desc }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>

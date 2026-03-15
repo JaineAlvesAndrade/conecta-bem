@@ -1,0 +1,63 @@
+<div class="events-page">
+  <div class="section-container">
+
+    <!-- Header -->
+    <div class="events-page__header">
+      <h1>Eventos de Voluntariado</h1>
+      <p>
+        Descubra oportunidades incríveis para fazer a diferença na sua comunidade.
+        Cada evento é uma chance de aprender, crescer e transformar vidas.
+      </p>
+    </div>
+
+    <!-- Filters -->
+    <div class="events-page__filters">
+      <div class="events-page__search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar eventos..."
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+        />
+      </div>
+
+      <div class="events-page__categories">
+        @for (cat of categories; track cat.value) {
+          <button
+            class="category-btn"
+            [class.category-btn--active]="selectedCategory() === cat.value"
+            (click)="setCategory(cat.value)"
+          >
+            {{ cat.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Results count -->
+    <p class="events-page__count">
+      {{ filteredEvents().length }} evento(s) encontrado(s)
+    </p>
+
+    <!-- List -->
+    <div class="events-page__list">
+      @for (event of filteredEvents(); track event.id) {
+        <app-event-card [event]="event" />
+      } @empty {
+        <div class="events-page__empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <p>Nenhum evento encontrado para os filtros selecionados.</p>
+          <button class="btn btn--outline btn--sm" (click)="setCategory('todos'); searchQuery.set('')">
+            Limpar filtros
+          </button>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>
