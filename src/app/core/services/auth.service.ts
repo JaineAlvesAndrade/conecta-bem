@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -28,8 +28,9 @@ export class AuthService {
     return this.http.post(`${this.base}/register`, payload);
   }
 
-  login(payload: LoginPayload): Observable<any> {
-    return this.http.post(`${this.base}/login`, payload);
+  login(payload: LoginPayload): Observable<HttpResponse<any>> {
+    // Observe the full response so callers can validate status codes
+    return this.http.post<any>(`${this.base}/login`, payload, { observe: 'response' });
   }
 
   /**

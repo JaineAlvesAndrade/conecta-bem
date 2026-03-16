@@ -94,14 +94,20 @@ export class AuthComponent {
       }).subscribe({
         next: (res: any) => {
           console.log('Login bem sucedido', res);
-          if (res && res.token) {
-            this.auth.saveToken(res.token);
+
+          // Validate that the request returned a 200 and there is a token
+          if (res?.status !== 200 || !res?.body?.token) {
+            this.errorMessage = 'auth.error.invalidCredentials';
+            return;
           }
+
+          this.auth.saveToken(res.body.token);
           this.router.navigate(['home']);
         },
         error: err => {
           console.error('Erro no login', err);
-          if (err?.status === 403) {
+          // Treat 401/403 as invalid credentials
+          if (err?.status === 401 || err?.status === 403) {
             this.errorMessage = 'auth.error.invalidCredentials';
           } else {
             this.errorMessage = 'auth.error.generic';
