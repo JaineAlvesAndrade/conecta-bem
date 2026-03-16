@@ -22,14 +22,45 @@ export class AuthComponent {
   confirmPassword = '';
   showPassword = false;
   showConfirm = false;
+  errorMessage = '';
+  emailError = '';
 
   constructor(private auth: AuthService, private router: Router) {}
 
   toggleMode() {
     this.isLogin = !this.isLogin;
+
+    // Reset form fields when switching between login and register modes
+    this.email = '';
+    this.password = '';
+    this.confirmPassword = '';
+    this.name = '';
+    this.showPassword = false;
+    this.showConfirm = false;
+
+    this.errorMessage = '';
+    this.emailError = '';
+  }
+
+  private isEmailValid(email: string) {
+    // Basic email validation (HTML5-like)
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  validateEmailOnBlur() {
+    this.emailError = this.isEmailValid(this.email) ? '' : 'auth.error.invalidEmail';
   }
 
   onSubmit() {
+    // Clear previous errors on every submit
+    this.errorMessage = '';
+    this.emailError = '';
+
+    if (!this.isEmailValid(this.email)) {
+      this.emailError = 'auth.error.invalidEmail';
+      return;
+    }
+
     if (!this.isLogin && this.password !== this.confirmPassword) {
       console.error('As senhas não coincidem');
       return;
@@ -50,7 +81,10 @@ export class AuthComponent {
           }
           this.router.navigate(['home']);
         },
-        error: err => console.error('Erro no cadastro', err)
+        error: err => {
+          console.error('Erro no cadastro', err);
+          this.errorMessage = 'auth.error.generic';
+        }
       });
     } else {
       // login via service
@@ -65,7 +99,14 @@ export class AuthComponent {
           }
           this.router.navigate(['home']);
         },
-        error: err => console.error('Erro no login', err)
+        error: err => {
+          console.error('Erro no login', err);
+          if (err?.status === 403) {
+            this.errorMessage = 'auth.error.invalidCredentials';
+          } else {
+            this.errorMessage = 'auth.error.generic';
+          }
+        }
       });
     }
   }

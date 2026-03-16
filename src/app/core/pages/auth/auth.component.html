@@ -4,6 +4,9 @@
             <img src="/assets/logo.png" alt="ConectaBem" class="logo">
             <h2>{{ (isLogin ? 'auth.title.login' : 'auth.title.register') | translate }}</h2>
             <p>{{ 'auth.subtitle' | translate }}</p>
+            <div class="error" *ngIf="errorMessage">
+                {{ errorMessage | translate }}
+            </div>
         </header>
 
             <form (submit)="onSubmit()">
@@ -14,7 +17,10 @@
 
             <div class="form-group">
                 <label>{{ 'auth.label.email' | translate }}</label>
-                <input type="email" [(ngModel)]="email" name="email" required>
+                <input type="email" [(ngModel)]="email" (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()" name="email" required>
+                <div class="error" *ngIf="emailError">
+                    {{ emailError | translate }}
+                </div>
             </div>
 
             <div class="form-group password-group">
@@ -48,7 +54,7 @@
         </form>
 
         <footer>
-            <a (click)="isLogin = !isLogin">
+            <a (click)="toggleMode()">
                 {{ isLogin ? ('auth.footer.noAccount' | translate) : ('auth.footer.haveAccount' | translate) }}
             </a>
         </footer>
