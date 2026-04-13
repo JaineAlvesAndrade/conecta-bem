@@ -22,10 +22,19 @@
     </nav>
 
     <div class="navbar__actions">
-      <a routerLink="/login" class="navbar__link">Entrar</a>
-      <a routerLink="/cadastro" class="btn btn--primary btn--sm">
-        Cadastre-se
-      </a>
+      @if (authService.isLoggedIn()) {
+        <!-- Usuário logado -->
+        <button class="navbar__user-menu" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      } @else {
+        <!-- Não logado -->
+        <a routerLink="/login" class="navbar__link">Entrar</a>
+        <a routerLink="/login" class="btn btn--primary btn--sm">
+          Cadastre-se
+        </a>
+      }
     </div>
 
     <button class="navbar__hamburger"
