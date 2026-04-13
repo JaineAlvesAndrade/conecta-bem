@@ -1,3 +1,5 @@
+import { Address } from "./address.model";
+
 export enum EventCategory {
   ENVIRONMENT = 'ENVIRONMENT',
   SOCIAL = 'SOCIAL',
@@ -20,16 +22,11 @@ export interface Event {
   id: string;
   title: string;
   description: string;
-  addressId: string;
+  address: Address;
   category: EventCategory;
   startsAt: string;
   endsAt: string;
   capacity: number;
   enrolledCount?: number;
-  // Campos opcionais para compatibilidade com dados mockados
-  organization?: string;
-  location?: string;
   imageUrl?: string;
-  urgent?: boolean;
-  points?: number;
 }

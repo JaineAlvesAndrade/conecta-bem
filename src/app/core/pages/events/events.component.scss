@@ -10,7 +10,7 @@
 
   &__header-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: flex-start;
     gap: 2rem;
 
@@ -145,10 +145,16 @@
     color: #d32f2f;
     text-align: center;
 
-    svg {
+    .error-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
       color: #d32f2f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
+    
     p {
       margin: 0;
       font-size: 0.95rem;

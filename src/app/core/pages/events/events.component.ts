@@ -7,11 +7,12 @@ import { AuthService } from '../../services/auth.service';
 import { EventCardComponent } from '../../components/event-card/event-card.component';
 import { CreateEventModalComponent } from '../../components/create-event-modal/create-event-modal.component';
 import { Event, EventCategory } from '../../models/event.model';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [EventCardComponent, CreateEventModalComponent, FormsModule, CommonModule],
+  imports: [EventCardComponent, CreateEventModalComponent, FormsModule, CommonModule, MatIcon],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss']
 })
@@ -48,9 +49,8 @@ export class EventsComponent implements OnInit {
       const matchCat    = mappedCat === 'todos' || e.category === mappedCat;
       const matchSearch = !query ||
         e.title.toLowerCase().includes(query) ||
-        e.description.toLowerCase().includes(query) ||
-        (e.location?.toLowerCase().includes(query) ?? false);
-      return matchCat && matchSearch;
+        e.description.toLowerCase().includes(query);
+        return matchCat && matchSearch;
     });
   });
 
@@ -99,8 +99,7 @@ export class EventsComponent implements OnInit {
         console.error('Erro ao carregar eventos:', err);
         this.error.set('Falha ao carregar eventos');
         this.isLoading.set(false);
-        // Fallback para dados mockados
-        this.allEvents.set(this.eventsService.getAll());
+        this.allEvents.set([]);
       }
     });
   }
