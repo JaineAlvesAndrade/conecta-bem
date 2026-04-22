@@ -6,6 +6,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'app-auth',
@@ -25,7 +27,9 @@ export class AuthComponent {
   errorMessage = '';
   emailError = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router, private route: ActivatedRoute) {
+    this.isLogin = this.route.snapshot.url[0]?.path !== 'cadastro';
+  }
 
   toggleMode() {
     this.isLogin = !this.isLogin;
@@ -123,5 +127,9 @@ export class AuthComponent {
 
   toggleShowConfirm() {
     this.showConfirm = !this.showConfirm;
+  }
+
+  goToChangePassword() {
+    this.router.navigate(['/alterar-senha']);
   }
 }

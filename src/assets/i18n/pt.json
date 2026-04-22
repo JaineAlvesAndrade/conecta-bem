@@ -13,5 +13,19 @@
   "auth.button.login": "Entrar",
   "auth.button.register": "Cadastrar",
   "auth.footer.noAccount": "Não tem conta? Cadastre-se",
-  "auth.footer.haveAccount": "Já tem conta? Faça login"
+  "auth.footer.haveAccount": "Já tem conta? Faça login",
+  "auth.footer.forgotPassword": "Esqueceu a senha?",
+  "changePassword.title": "Alterar senha",
+  "changePassword.subtitle": "Informe sua senha atual e escolha uma nova.",
+  "changePassword.label.currentPassword": "Senha atual",
+  "changePassword.label.newPassword": "Nova senha",
+  "changePassword.label.confirmPassword": "Confirmar nova senha",
+  "changePassword.button.submit": "Alterar senha",
+  "changePassword.button.loading": "Aguarde...",
+  "changePassword.error.passwordMismatch": "As senhas não coincidem",
+  "changePassword.error.generic": "Não foi possível alterar a senha. Verifique sua senha atual e tente novamente.",
+  "changePassword.success.title": "Senha alterada!",
+  "changePassword.success.subtitle": "Sua senha foi atualizada com sucesso.",
+  "changePassword.success.backToLogin": "Voltar para o login",
+  "changePassword.footer.backToLogin": "Voltar para o login"
 }

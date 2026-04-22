@@ -13,5 +13,19 @@
   "auth.button.login": "Log in",
   "auth.button.register": "Register",
   "auth.footer.noAccount": "Don't have an account? Sign up",
-  "auth.footer.haveAccount": "Already have an account? Log in"
+  "auth.footer.haveAccount": "Already have an account? Log in",
+  "auth.footer.forgotPassword": "Forgot password?",
+  "changePassword.title": "Change password",
+  "changePassword.subtitle": "Enter your current password and choose a new one.",
+  "changePassword.label.currentPassword": "Current password",
+  "changePassword.label.newPassword": "New password",
+  "changePassword.label.confirmPassword": "Confirm new password",
+  "changePassword.button.submit": "Change password",
+  "changePassword.button.loading": "Please wait...",
+  "changePassword.error.passwordMismatch": "Passwords do not match",
+  "changePassword.error.generic": "Could not change password. Check your current password and try again.",
+  "changePassword.success.title": "Password changed!",
+  "changePassword.success.subtitle": "Your password has been updated successfully.",
+  "changePassword.success.backToLogin": "Back to login",
+  "changePassword.footer.backToLogin": "Back to login"
 }
