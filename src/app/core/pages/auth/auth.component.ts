@@ -80,10 +80,11 @@ export class AuthComponent {
       }).subscribe({
         next: (res: any) => {
           console.log('Cadastro realizado', res);
-          if (res && res.token) {
-            this.auth.saveToken(res.token);
+          // Salva token se retornar
+          if (res && (res.jwtToken || res.token)) {
+            this.auth.saveToken(res.jwtToken || res.token);
           }
-          this.router.navigate(['home']);
+          this.router.navigate(['/']);
         },
         error: err => {
           console.error('Erro no cadastro', err);
@@ -97,16 +98,14 @@ export class AuthComponent {
         password: this.password
       }).subscribe({
         next: (res: any) => {
-          console.log('Login bem sucedido', res);
-
           // Validate that the request returned a 200 and there is a token
-          if (res?.status !== 200 || !res?.body?.token) {
+          if (res?.status !== 200 || !res?.body?.jwtToken) {
             this.errorMessage = 'auth.error.invalidCredentials';
             return;
           }
 
-          this.auth.saveToken(res.body.token);
-          this.router.navigate(['home']);
+          this.auth.saveToken(res.body.jwtToken);
+          this.router.navigate(['/']);
         },
         error: err => {
           console.error('Erro no login', err);

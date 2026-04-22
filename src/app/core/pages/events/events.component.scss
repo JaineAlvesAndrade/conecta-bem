@@ -6,6 +6,19 @@
     text-align: center;
     margin-bottom: 2rem;
     padding: 1rem 0 0.5rem;
+  }
+
+  &__header-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
 
     h1 {
       font-size: 1.9rem;
@@ -18,9 +31,20 @@
     p {
       color: #888;
       max-width: 520px;
-      margin: 0 auto;
       line-height: 1.6;
       font-size: 0.875rem;
+      margin: 0;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      white-space: nowrap;
+      margin-top: 0.5rem;
+      padding: 1rem 1.75rem;
+      font-size: 1rem;
+      font-weight: 500;
     }
   }
 
@@ -93,6 +117,44 @@
     color: var(--color-text-muted);
     text-align: center;
 
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    color: var(--color-text-muted);
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 4rem 0;
+    color: #d32f2f;
+    text-align: center;
+
+    .error-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #d32f2f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
     p {
       margin: 0;
       font-size: 0.95rem;

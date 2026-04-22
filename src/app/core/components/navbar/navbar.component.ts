@@ -17,7 +17,7 @@ export class NavbarComponent {
   constructor(
     public authService: AuthService,
     private router: Router
-  ) { }
+  ) {}
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
