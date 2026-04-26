@@ -1,5 +1,3 @@
-// event-card.component.ts (removido o organizador)
-
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
