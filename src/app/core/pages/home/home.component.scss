@@ -7,10 +7,14 @@
   margin: 0 auto;
   padding: 4rem 1.5rem;
 
-  h1 { font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin: 0 0 1rem; }
-  p  { color: var(--color-text-muted); line-height: 1.7; margin: 0 0 2rem; }
+  h1 { font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin: 0 0 1rem; color: #111; }
+  p  { color: #555; line-height: 1.7; margin: 0 0 2rem; }
 
-  &__actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  &__actions { 
+    display: flex; 
+    gap: 1rem; 
+    flex-wrap: wrap;
+  }
 
   &__image img {
     width: 100%;
@@ -25,15 +29,26 @@
   }
 }
 
+.btn--full {
+  width: 100%;
+  padding-left: 60px;
+  padding-right: 60px;
+  
+  @media (min-width: 640px) {
+    width: auto;
+    min-width: 200px;
+  }
+}
+
 .mission {
   background: #fafafa;
   padding: 4rem 0;
   text-align: center;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
 
-  h2 { font-size: 1.8rem; font-weight: 700; margin: 0 0 1rem; }
-  p  { color: var(--color-text-muted); max-width: 540px; margin: 0 auto; line-height: 1.7; }
+  h2 { font-size: 1.8rem; font-weight: 700; margin: 0 0 1rem; color: #111; }
+  p  { color: #000; max-width: 540px; margin: 0 auto; line-height: 1.7; }
 }
 
 .stats {
@@ -49,10 +64,51 @@
   }
 }
 
+// Estilo para os cards de estatística
+.stat-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  background: #fff;
+  transition: box-shadow 0.2s;
+
+  &:hover { 
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06); 
+  }
+
+  &__icon {
+    display: flex;
+    justify-content: center;
+    color: #000;
+    margin-bottom: 0.5rem;
+    
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #000;
+    }
+  }
+
+  &__value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #111;
+    line-height: 1.2;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+}
+
 .pillars {
   background: #fafafa;
   padding: 4rem 0;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid #e0e0e0;
 
   &__grid {
     display: grid;
@@ -69,10 +125,23 @@
   &__icon {
     display: flex;
     justify-content: center;
-    color: var(--color-text-muted);
+    color: #000;
     margin-bottom: 1rem;
+    
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #000;
+    }
   }
 
-  h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 0.5rem; }
-  p  { font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6; margin: 0; }
+  h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 0.5rem; color: #111; }
+  p  { font-size: 0.875rem; color: #555; line-height: 1.6; margin: 0; }
+}
+
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }

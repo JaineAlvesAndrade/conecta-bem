@@ -3,244 +3,182 @@
     <div class="modal-header">
       <h2>{{ isEditMode ? 'Editar Evento' : 'Criar Novo Evento' }}</h2>
       <button class="modal-close" (click)="closeModal()" aria-label="Fechar">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
+        <mat-icon>close</mat-icon>
       </button>
     </div>
 
     <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="modal-form">
       <!-- Erro global -->
       @if (error()) {
-        <div class="alert alert--error">{{ error() }}</div>
+      <div class="alert alert--error">{{ error() }}</div>
       }
 
       <!-- Loading addresses -->
       @if (isLoadingAddresses()) {
-        <div class="alert alert--info">Carregando endereços...</div>
+      <div class="alert alert--info">Carregando endereços...</div>
       }
 
       <!-- Title -->
       <div class="form-group">
         <label for="title">Título do Evento *</label>
-        <input
-          id="title"
-          type="text"
-          formControlName="title"
-          placeholder="Ex: Educação para Todos"
-          class="form-input"
-          [class.form-input--error]="eventForm.get('title')?.invalid && eventForm.get('title')?.touched"
-        />
+        <input id="title" type="text" formControlName="title" placeholder="Ex: Educação para Todos" class="form-input"
+          [class.form-input--error]="eventForm.get('title')?.invalid && eventForm.get('title')?.touched" />
         @if (getFieldError('title', eventForm)) {
-          <span class="form-error">{{ getFieldError('title', eventForm) }}</span>
+        <span class="form-error">{{ getFieldError('title', eventForm) }}</span>
         }
       </div>
 
       <!-- Description -->
       <div class="form-group">
         <label for="description">Descrição *</label>
-        <textarea
-          id="description"
-          formControlName="description"
-          placeholder="Descreva o evento em detalhes..."
-          class="form-input form-input--textarea"
-          rows="4"
-          [class.form-input--error]="eventForm.get('description')?.invalid && eventForm.get('description')?.touched"
-        ></textarea>
+        <textarea id="description" formControlName="description" placeholder="Descreva o evento em detalhes..."
+          class="form-input form-input--textarea" rows="4"
+          [class.form-input--error]="eventForm.get('description')?.invalid && eventForm.get('description')?.touched"></textarea>
         @if (getFieldError('description', eventForm)) {
-          <span class="form-error">{{ getFieldError('description', eventForm) }}</span>
+        <span class="form-error">{{ getFieldError('description', eventForm) }}</span>
         }
       </div>
 
+      <!-- Image Upload -->
       <div class="form-group">
         <label for="image">Imagem do Evento</label>
-        <input
-          id="image"
-          type="file"
-          accept="image/*"
-          class="form-input form-input--file"
-          (change)="onImageSelected($event)"
-        />
+        <input id="image" type="file" accept="image/*" class="form-input form-input--file"
+          (change)="onImageSelected($event)" />
         <small class="form-help">Opcional. Envie uma imagem para destacar o evento na lista e no detalhe.</small>
 
+        <!-- Só mostra preview se tiver imagem selecionada ou imagem existente no evento -->
+        @if (selectedImage() || (isEditMode && (eventToEdit?.imageUrl || eventToEdit?.image))) {
         <div class="image-preview">
           <img [src]="imagePreview()" [alt]="eventForm.get('title')?.value || 'Pré-visualização da imagem'" />
         </div>
 
         @if (isEditMode && (eventToEdit?.imageUrl || eventToEdit?.image)) {
-          <button type="button" class="btn btn--outline btn--sm image-remove-btn" (click)="requestDeleteImage()" [disabled]="isDeletingImage()">
-            {{ isDeletingImage() ? 'Removendo...' : 'Remover imagem' }}
-          </button>
+        <button type="button" class="btn btn--outline btn--sm image-remove-btn" (click)="requestDeleteImage()"
+          [disabled]="isDeletingImage()">
+          {{ isDeletingImage() ? 'Removendo...' : 'Remover imagem' }}
+        </button>
+        }
         }
       </div>
 
       <!-- Address Selection / Create Address Toggle -->
-      <div class="form-group">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <div class="address-section">
+        <div class="address-header">
           <label for="addressId">Localização *</label>
-          <button
-            type="button"
-            class="btn-toggle"
-            (click)="toggleCreateAddressForm()"
-            [class.btn-toggle--active]="showCreateAddressForm()"
-          >
+          <button type="button" class="btn-toggle" (click)="toggleCreateAddressForm()"
+            [class.btn-toggle--active]="showCreateAddressForm()">
             @if (!showCreateAddressForm()) {
-              <span>+ Adicionar novo</span>
+            <span>+ Novo Endereço</span>
             } @else {
-              <span>- Cancelar criação</span>
+            <span>✕ Cancelar</span>
             }
           </button>
         </div>
 
         @if (!showCreateAddressForm()) {
-          <select
-            id="addressId"
-            formControlName="addressId"
-            class="form-input"
+        <div class="address-select-wrapper">
+          <select id="addressId" formControlName="addressId" class="form-input"
             [disabled]="isLoadingAddresses() || addresses().length === 0"
-            [class.form-input--error]="eventForm.get('addressId')?.invalid && eventForm.get('addressId')?.touched"
-          >
+            [class.form-input--error]="eventForm.get('addressId')?.invalid && eventForm.get('addressId')?.touched">
             <option value="">Selecione um endereço</option>
             @for (address of addresses(); track address.id) {
-              <option [value]="address.id">{{ getAddressLabel(address) }}</option>
+            <option [value]="address.id">{{ getAddressLabel(address) }}</option>
             }
           </select>
           @if (getFieldError('addressId', eventForm)) {
-            <span class="form-error">{{ getFieldError('addressId', eventForm) }}</span>
+          <span class="form-error">{{ getFieldError('addressId', eventForm) }}</span>
           }
+        </div>
         } @else {
-          <!-- Create Address Form -->
-          <div class="create-address-form">
-            @if (addressError()) {
-              <div class="alert alert--error" style="margin-bottom: 1rem;">{{ addressError() }}</div>
-            }
+        <!-- Create Address Form -->
+        <div class="create-address-form">
+          @if (addressError()) {
+          <div class="alert alert--error" style="margin-bottom: 1rem;">{{ addressError() }}</div>
+          }
 
-            <form [formGroup]="addressForm" class="form-grid">
+          <form [formGroup]="addressForm">
+            <div class="form-grid">
               <!-- Country -->
               <div class="form-group form-group--sm">
                 <label for="country">País *</label>
-                <input
-                  id="country"
-                  type="text"
-                  formControlName="country"
-                  class="form-input form-input--sm"
-                  [class.form-input--error]="addressForm.get('country')?.invalid && addressForm.get('country')?.touched"
-                />
+                <input id="country" type="text" formControlName="country" class="form-input form-input--sm"
+                  [class.form-input--error]="addressForm.get('country')?.invalid && addressForm.get('country')?.touched" />
               </div>
 
               <!-- State -->
               <div class="form-group form-group--sm">
                 <label for="state">Estado *</label>
-                <input
-                  id="state"
-                  type="text"
-                  formControlName="state"
-                  placeholder="Ex: SP"
+                <input id="state" type="text" formControlName="state" placeholder="Ex: SP"
                   class="form-input form-input--sm"
-                  [class.form-input--error]="addressForm.get('state')?.invalid && addressForm.get('state')?.touched"
-                />
+                  [class.form-input--error]="addressForm.get('state')?.invalid && addressForm.get('state')?.touched" />
               </div>
 
               <!-- City -->
               <div class="form-group form-group--sm">
                 <label for="city">Cidade *</label>
-                <input
-                  id="city"
-                  type="text"
-                  formControlName="city"
-                  class="form-input form-input--sm"
-                  [class.form-input--error]="addressForm.get('city')?.invalid && addressForm.get('city')?.touched"
-                />
+                <input id="city" type="text" formControlName="city" class="form-input form-input--sm"
+                  [class.form-input--error]="addressForm.get('city')?.invalid && addressForm.get('city')?.touched" />
               </div>
 
               <!-- Postal Code -->
               <div class="form-group form-group--sm">
                 <label for="postalCode">CEP *</label>
-                <input
-                  id="postalCode"
-                  type="text"
-                  formControlName="postalCode"
-                  placeholder="Ex: 89012-220"
+                <input id="postalCode" type="text" formControlName="postalCode" placeholder="Ex: 89012-220"
                   class="form-input form-input--sm"
-                  [class.form-input--error]="addressForm.get('postalCode')?.invalid && addressForm.get('postalCode')?.touched"
-                />
+                  [class.form-input--error]="addressForm.get('postalCode')?.invalid && addressForm.get('postalCode')?.touched" />
               </div>
 
               <!-- Neighborhood -->
               <div class="form-group form-group--sm">
                 <label for="neighborhood">Bairro *</label>
-                <input
-                  id="neighborhood"
-                  type="text"
-                  formControlName="neighborhood"
-                  class="form-input form-input--sm"
-                  [class.form-input--error]="addressForm.get('neighborhood')?.invalid && addressForm.get('neighborhood')?.touched"
-                />
+                <input id="neighborhood" type="text" formControlName="neighborhood" class="form-input form-input--sm"
+                  [class.form-input--error]="addressForm.get('neighborhood')?.invalid && addressForm.get('neighborhood')?.touched" />
               </div>
 
               <!-- Street -->
               <div class="form-group form-group--sm">
                 <label for="street">Rua *</label>
-                <input
-                  id="street"
-                  type="text"
-                  formControlName="street"
-                  class="form-input form-input--sm"
-                  [class.form-input--error]="addressForm.get('street')?.invalid && addressForm.get('street')?.touched"
-                />
+                <input id="street" type="text" formControlName="street" class="form-input form-input--sm"
+                  [class.form-input--error]="addressForm.get('street')?.invalid && addressForm.get('street')?.touched" />
               </div>
 
               <!-- Number -->
               <div class="form-group form-group--sm">
                 <label for="number">Número *</label>
-                <input
-                  id="number"
-                  type="text"
-                  formControlName="number"
-                  class="form-input form-input--sm"
-                  [class.form-input--error]="addressForm.get('number')?.invalid && addressForm.get('number')?.touched"
-                />
+                <input id="number" type="text" formControlName="number" class="form-input form-input--sm"
+                  [class.form-input--error]="addressForm.get('number')?.invalid && addressForm.get('number')?.touched" />
               </div>
 
               <!-- Complement -->
               <div class="form-group form-group--sm">
                 <label for="complement">Complemento</label>
-                <input
-                  id="complement"
-                  type="text"
-                  formControlName="complement"
-                  placeholder="Ex: Apto 123"
-                  class="form-input form-input--sm"
-                />
+                <input id="complement" type="text" formControlName="complement" placeholder="Ex: Apto 123"
+                  class="form-input form-input--sm" />
               </div>
 
               <!-- Reference -->
               <div class="form-group form-group--sm">
                 <label for="reference">Referência</label>
-                <input
-                  id="reference"
-                  type="text"
-                  formControlName="reference"
-                  placeholder="Ex: Perto da escola"
-                  class="form-input form-input--sm"
-                />
+                <input id="reference" type="text" formControlName="reference" placeholder="Ex: Perto da escola"
+                  class="form-input form-input--sm" />
               </div>
-            </form>
+            </div>
 
-            <button
-              type="button"
-              class="btn btn--primary btn--sm"
-              (click)="onCreateAddress()"
-              [disabled]="addressForm.invalid || isCreatingAddress()"
-              style="margin-top: 1rem; width: 100%;"
-            >
-              @if (isCreatingAddress()) {
+            <div class="address-actions">
+              <button type="button" class="btn-cancel-address" (click)="toggleCreateAddressForm()">
+                Cancelar
+              </button>
+              <button type="button" class="btn-create-address" (click)="onCreateAddress()"
+                [disabled]="addressForm.invalid || isCreatingAddress()">
+                @if (isCreatingAddress()) {
                 <span>Criando...</span>
-              } @else {
-                <span>Confirmar Endereço</span>
-              }
-            </button>
-          </div>
+                } @else {
+                <span>Salvar Endereço</span>
+                }
+              </button>
+            </div>
+          </form>
+        </div>
         }
       </div>
 
@@ -248,18 +186,14 @@
         <!-- Category -->
         <div class="form-group">
           <label for="category">Categoria *</label>
-          <select
-            id="category"
-            formControlName="category"
-            class="form-input"
-            [class.form-input--error]="eventForm.get('category')?.invalid && eventForm.get('category')?.touched"
-          >
+          <select id="category" formControlName="category" class="form-input"
+            [class.form-input--error]="eventForm.get('category')?.invalid && eventForm.get('category')?.touched">
             @for (cat of categories; track cat.value) {
-              <option [value]="cat.value">{{ cat.label }}</option>
+            <option [value]="cat.value">{{ cat.label }}</option>
             }
           </select>
           @if (getFieldError('category', eventForm)) {
-            <span class="form-error">{{ getFieldError('category', eventForm) }}</span>
+          <span class="form-error">{{ getFieldError('category', eventForm) }}</span>
           }
         </div>
       </div>
@@ -268,30 +202,20 @@
         <!-- Starts At -->
         <div class="form-group">
           <label for="startsAt">Data e Hora de Início *</label>
-          <input
-            id="startsAt"
-            type="datetime-local"
-            formControlName="startsAt"
-            class="form-input"
-            [class.form-input--error]="eventForm.get('startsAt')?.invalid && eventForm.get('startsAt')?.touched"
-          />
+          <input id="startsAt" type="datetime-local" formControlName="startsAt" class="form-input"
+            [class.form-input--error]="eventForm.get('startsAt')?.invalid && eventForm.get('startsAt')?.touched" />
           @if (getFieldError('startsAt', eventForm)) {
-            <span class="form-error">{{ getFieldError('startsAt', eventForm) }}</span>
+          <span class="form-error">{{ getFieldError('startsAt', eventForm) }}</span>
           }
         </div>
 
         <!-- Ends At -->
         <div class="form-group">
           <label for="endsAt">Data e Hora de Término *</label>
-          <input
-            id="endsAt"
-            type="datetime-local"
-            formControlName="endsAt"
-            class="form-input"
-            [class.form-input--error]="eventForm.get('endsAt')?.invalid && eventForm.get('endsAt')?.touched"
-          />
+          <input id="endsAt" type="datetime-local" formControlName="endsAt" class="form-input"
+            [class.form-input--error]="eventForm.get('endsAt')?.invalid && eventForm.get('endsAt')?.touched" />
           @if (getFieldError('endsAt', eventForm)) {
-            <span class="form-error">{{ getFieldError('endsAt', eventForm) }}</span>
+          <span class="form-error">{{ getFieldError('endsAt', eventForm) }}</span>
           }
         </div>
       </div>
@@ -299,16 +223,10 @@
       <!-- Capacity -->
       <div class="form-group">
         <label for="capacity">Vagas Disponíveis *</label>
-        <input
-          id="capacity"
-          type="number"
-          formControlName="capacity"
-          placeholder="Ex: 20"
-          class="form-input"
-          [class.form-input--error]="eventForm.get('capacity')?.invalid && eventForm.get('capacity')?.touched"
-        />
+        <input id="capacity" type="number" formControlName="capacity" placeholder="Ex: 20" class="form-input"
+          [class.form-input--error]="eventForm.get('capacity')?.invalid && eventForm.get('capacity')?.touched" />
         @if (getFieldError('capacity', eventForm)) {
-          <span class="form-error">{{ getFieldError('capacity', eventForm) }}</span>
+        <span class="form-error">{{ getFieldError('capacity', eventForm) }}</span>
         }
       </div>
 
@@ -316,31 +234,33 @@
         <button type="button" class="btn btn--outline" (click)="closeModal()">
           Cancelar
         </button>
-        <button type="submit" class="btn btn--primary" [disabled]="eventForm.invalid || isSubmitting() || isLoadingAddresses()">
+        <button type="submit" class="btn btn--primary"
+          [disabled]="eventForm.invalid || isSubmitting() || isLoadingAddresses()">
           @if (isSubmitting()) {
-            <span>{{ isEditMode ? 'Salvando...' : 'Criando...' }}</span>
+          <span>{{ isEditMode ? 'Salvando...' : 'Criando...' }}</span>
           } @else {
-            <span>{{ isEditMode ? 'Salvar Alterações' : 'Criar Evento' }}</span>
+          <span>{{ isEditMode ? 'Salvar Alterações' : 'Criar Evento' }}</span>
           }
         </button>
       </div>
 
       @if (showDeleteImageConfirm()) {
-        <div class="image-delete-confirm" (click)="cancelDeleteImage()">
-          <div class="image-delete-confirm__modal" (click)="$event.stopPropagation()">
-            <h3>Remover imagem?</h3>
-            <p>Essa ação não é reversível. A imagem será removida permanentemente do evento.</p>
+      <div class="image-delete-confirm" (click)="cancelDeleteImage()">
+        <div class="image-delete-confirm__modal" (click)="$event.stopPropagation()">
+          <h3>Remover imagem?</h3>
+          <p>Essa ação não é reversível. A imagem será removida permanentemente do evento.</p>
 
-            <div class="image-delete-confirm__actions">
-              <button type="button" class="btn btn--outline" (click)="cancelDeleteImage()" [disabled]="isDeletingImage()">
-                Cancelar
-              </button>
-              <button type="button" class="btn btn--primary" (click)="confirmDeleteImage()" [disabled]="isDeletingImage()">
-                {{ isDeletingImage() ? 'Removendo...' : 'Sim, remover' }}
-              </button>
-            </div>
+          <div class="image-delete-confirm__actions">
+            <button type="button" class="btn btn--outline" (click)="cancelDeleteImage()" [disabled]="isDeletingImage()">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn--primary" (click)="confirmDeleteImage()"
+              [disabled]="isDeletingImage()">
+              {{ isDeletingImage() ? 'Removendo...' : 'Sim, remover' }}
+            </button>
           </div>
         </div>
+      </div>
       }
     </form>
   </div>
