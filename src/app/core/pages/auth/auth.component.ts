@@ -32,6 +32,7 @@ export class AuthComponent {
   ) {
     const mode = this.route.snapshot.data['mode'];
     this.isLogin = mode !== 'register';
+     this.isLogin = this.route.snapshot.url[0]?.path !== 'cadastro';
   }
 
   toggleMode() {
@@ -129,5 +130,9 @@ export class AuthComponent {
 
   toggleShowConfirm() {
     this.showConfirm = !this.showConfirm;
+  }
+
+  goToChangePassword() {
+    this.router.navigate(['/alterar-senha']);
   }
 }

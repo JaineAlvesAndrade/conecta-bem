@@ -56,6 +56,7 @@
     color: var(--color-text-muted);
     text-decoration: none;
     transition: color 0.2s;
+    cursor: pointer;
 
     &:hover,
     &.active {
@@ -70,37 +71,103 @@
     justify-self: end;
   }
 
-  &__user-menu {
+  // ── User dropdown ──────────────────────────────────────────────────────────
+
+  &__user {
+    position: relative;
+  }
+
+  &__user-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
     background: none;
     border: 1.5px solid var(--color-border);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
     cursor: pointer;
-    font-size: 0.9rem;
     color: var(--color-text);
     transition: all 0.2s;
-    font-family: inherit;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
 
     &:hover {
-      border-color: #d32f2f;
-      color: #d32f2f;
-      background: rgba(211, 47, 47, 0.05);
+      border-color: var(--color-primary);
+      background: var(--color-bg);
     }
+  }
+
+  &__user--open &__user-btn {
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    min-width: 170px;
+    overflow: hidden;
+    animation: dropdown-in 0.15s ease;
+    z-index: 200;
+  }
+
+  @keyframes dropdown-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  &__dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
 
     mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
+      color: var(--color-text-muted);
+    }
+
+    &:hover {
+      background: var(--color-bg);
+    }
+
+    &--danger {
+      color: #d32f2f;
+
+      mat-icon { color: #d32f2f; }
+
+      &:hover { background: rgba(211, 47, 47, 0.05); }
     }
   }
+
+  &__dropdown-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0.25rem 0;
+  }
+
+  // ── Hamburger ──────────────────────────────────────────────────────────────
 
   &__hamburger {
     display: none;
   }
-
 
   @media (max-width: 768px) {
 

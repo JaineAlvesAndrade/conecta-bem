@@ -1,0 +1,83 @@
+<div class="about-page">
+
+  <!-- Hero -->
+  <section class="about-hero">
+    <div class="about-hero__tag">Nossa história</div>
+    <h1 class="about-hero__title">
+      Conectando quem quer<br>
+      <span class="about-hero__highlight">ajudar</span> a quem
+      <span class="about-hero__highlight">precisa.</span>
+    </h1>
+    <p class="about-hero__sub">
+      Um projeto universitário que nasceu de uma ideia simples e se tornou
+      uma ponte real entre ONGs e voluntários.
+    </p>
+  </section>
+
+  <!-- História -->
+  <section class="about-section section-container">
+    <div class="about-origin">
+      <div class="about-origin__label">Como tudo começou</div>
+      <div class="about-origin__body">
+        <p>
+          O <strong>ConectaBem</strong> nasceu nas salas da
+          <strong>Universidade Regional de Blumenau — FURB</strong>, nas
+          disciplinas de <em>Projeto de Software</em> e
+          <em>Projeto de Software II</em>, sob orientação dos professores
+          <strong>Everaldo Artur Grahl</strong> e
+          <strong>André Felipe Bürguer</strong>.
+        </p>
+        <p>
+          Cinco estudantes —
+          <strong>Jaíne Andrade</strong>,
+          <strong>Victor Kruger</strong>,
+          <strong>Ralf Domingues</strong>,
+          <strong>Pedro Hennig</strong> e
+          <strong>Felipe Oliveira</strong> —
+          perceberam uma lacuna real: ONGs com missões poderosas, mas sem
+          visibilidade; voluntários dispostos a agir, mas sem saber onde
+          começar. A resposta foi criar uma plataforma que tornasse esse
+          encontro simples, rápido e humano.
+        </p>
+        <p>
+          O que começou como um trabalho acadêmico evoluiu para um produto
+          pensado de verdade para as pessoas: cada tela, cada funcionalidade
+          e cada decisão de design foram guiadas por uma única pergunta —
+          <em>como facilitar ao máximo a conexão entre quem quer ajudar e
+          quem precisa de ajuda?</em>
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Missão + Valores -->
+  <section class="about-values section-container">
+
+    <div class="about-mission">
+      <div class="about-mission__icon">
+        <mat-icon>rocket_launch</mat-icon>
+      </div>
+      <div>
+        <h2>Nossa missão</h2>
+        <p>
+          Facilitar o contato entre organizações sem fins lucrativos e
+          voluntários, reduzindo a burocracia e ampliando o impacto social
+          em cada comunidade.
+        </p>
+      </div>
+    </div>
+
+    <div class="about-values__grid">
+      <div class="about-value-card" *ngFor="let value of values">
+        <div class="about-value-card__icon">
+          <mat-icon>{{ value.icon }}</mat-icon>
+        </div>
+        <h3>{{ value.title }}</h3>
+        <p>{{ value.description }}</p>
+      </div>
+    </div>
+
+  </section>
+
+</div>

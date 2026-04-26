@@ -18,6 +18,8 @@ body {
     margin: 0;
 }
 
+// ─── Buttons ────────────────────────────────────────────────────────────────
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -75,8 +77,132 @@ body {
     }
 }
 
+// ─── Layout ─────────────────────────────────────────────────────────────────
+
 .section-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1.5rem;
+}
+
+// ─── Auth / Forms ────────────────────────────────────────────────────────────
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.auth-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+
+    h2 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    footer {
+        margin-top: 1.5rem;
+
+        a {
+            color: var(--color-text-muted);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.85rem;
+        }
+    }
+}
+
+.logo {
+    width: 140px;
+    height: auto;
+    display: block;
+    margin: 0 auto 1rem auto;
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 1.2rem;
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        outline: none;
+        font-family: inherit;
+        transition: border 0.3s;
+
+        &:focus {
+            border-color: var(--color-primary);
+        }
+    }
+}
+
+.password-group .password-field {
+    display: flex;
+    align-items: center;
+
+    input {
+        flex: 1;
+    }
+
+    .eye {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        margin-left: 0.5rem;
+        font-size: 1.05rem;
+        color: var(--color-text-muted);
+    }
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 0.9rem;
+    background-color: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.9;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.error {
+    color: #d9534f;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
 }
