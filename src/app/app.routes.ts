@@ -4,6 +4,7 @@ import { HomeComponent } from './core/pages/home/home.component';
 import { EventsComponent } from './core/pages/events/events.component';
 import { ChangePasswordComponent } from './core/pages/change-password/change-password.component';
 import { ProfileComponent } from './core/pages/profile/profile.component';
+import { AboutUsComponent } from './core/pages/about-us/about-us.component';
 
 export const routes: Routes = [
     { 
@@ -29,5 +30,9 @@ export const routes: Routes = [
     { 
         path: 'perfil', 
         component: ProfileComponent 
+    },
+    {
+        path: 'sobre',
+        component: AboutUsComponent
     }
 ];
