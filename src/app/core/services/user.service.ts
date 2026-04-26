@@ -2,33 +2,28 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-
-export interface UserProfile {
-  fullName:   string;
-  cpfOrCnpj: string;
-  birthDate:  string;       // ISO date string, e.g. "1995-06-15"
-  email:      string;
-  gender:     string;
-  phone:      string;
-  instagram:  string;
-  linkedin:   string;
-}
-
-export interface UpdatePasswordPayload {
-  email:           string;
-  currentPassword: string;
-  newPassword:     string;
-}
+import { AuthService } from './auth.service';
+import { UpdatePasswordPayload, UserProfile } from '../models/profile.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly base = `${environment.baseApiUrl}/user`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) { }
+
+  private getAuthHeaders() {
+    const token = this.authService.getToken();
+    return {
+      'Authorization': `Bearer ${token}`
+    };
+  }
 
   /** GET /user/profile */
   getProfile(): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.base}/profile`);
+    return this.http.get<UserProfile>(
+      `${this.base}/profile`,
+      { headers: this.getAuthHeaders() }
+    );
   }
 
   /**
@@ -36,14 +31,21 @@ export class UserService {
    * Sends only the editable fields (partial update).
    */
   updateProfile(payload: Partial<UserProfile>): Observable<any> {
-    return this.http.post(`${this.base}/update`, payload);
+    return this.http.post(
+      `${this.base}/update`, 
+      payload,
+      { headers: this.getAuthHeaders() }
+    );
   }
 
   /**
    * POST /user/update
-   * Sends email + currentPassword + newPassword to change the password.
    */
   updatePassword(payload: UpdatePasswordPayload): Observable<any> {
-    return this.http.post(`${this.base}/update`, payload);
+    return this.http.post(
+      `${this.base}/update`, 
+      payload,
+     { headers: this.getAuthHeaders() }
+    );
   }
 }

@@ -43,7 +43,6 @@ export class AuthService {
   }
 
   login(payload: LoginPayload): Observable<HttpResponse<any>> {
-    // Observe the full response so callers can validate status codes
     return this.http.post<any>(`${this.base}/login`, payload, { observe: 'response' });
   }
 

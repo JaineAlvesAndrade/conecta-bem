@@ -1,81 +1,189 @@
-// Shared form styles (form-group, password-group, etc.) come from global styles.scss
+// profile.component.scss (atualizado)
 
 .profile-page {
-  max-width: 680px;
-  margin: 2.5rem auto;
-  padding: 0 1.5rem 4rem;
+  min-height: calc(100vh - 64px);
+  background: #f8f9fa;
+  padding: 2rem 1.5rem;
 }
 
-// ── Header ──────────────────────────────────────────────────────────────────
+// ── Container Principal ─────────────────────────────────────────────────────
 
-.profile-header {
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 2rem;
+  gap: 2rem;
+  align-items: flex-start;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 }
 
-.profile-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+// ── Sidebar ─────────────────────────────────────────────────────────────────
+
+.profile-sidebar {
   flex-shrink: 0;
-
-  mat-icon {
-    font-size: 2rem;
-    width: 2rem;
-    height: 2rem;
-    color: var(--color-text-muted);
-  }
-}
-
-.profile-header__info {
-  h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 0 0 0.2rem;
-  }
-}
-
-.profile-doc {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-}
-
-// ── Sections ─────────────────────────────────────────────────────────────────
-
-.profile-section {
+  width: 280px;
   background: #fff;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 1.75rem;
-  margin-bottom: 1.25rem;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #e8e8e8;
+  position: sticky;
+  top: 88px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    position: static;
+  }
 }
 
-.profile-section__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.profile-name {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e8e8e8;
   margin-bottom: 1.5rem;
 
   h2 {
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    margin: 0;
+    margin: 0 0 0.25rem;
+    color: #111;
   }
 
-  .btn mat-icon {
-    font-size: 1rem;
-    width: 1rem;
-    height: 1rem;
+  .profile-doc {
+    font-size: 0.8rem;
+    color: #888;
   }
 }
 
-// ── Read mode fields ──────────────────────────────────────────────────────────
+.profile-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profile-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: #999;
+  }
+
+  span {
+    flex: 1;
+  }
+
+  &:hover {
+    background: #f5f5f5;
+    color: #111;
+
+    mat-icon {
+      color: #111;
+    }
+  }
+
+  &.active {
+    background: #111;
+    color: #fff;
+
+    mat-icon {
+      color: #fff;
+    }
+  }
+}
+
+// ── Conteúdo Principal ──────────────────────────────────────────────────────
+
+.profile-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── Cards ───────────────────────────────────────────────────────────────────
+
+.profile-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e8e8e8;
+  padding: 1.75rem;
+}
+
+.profile-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e8e8e8;
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #111;
+  }
+}
+
+// ── Botão de Editar (mais sutil) ───────────────────────────────────────────
+
+.btn-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    border-color: #111;
+    color: #111;
+    background: #fafafa;
+  }
+}
+
+// ── Campos em Modo Leitura ─────────────────────────────────────────────────
 
 .profile-fields {
   display: flex;
@@ -87,8 +195,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 0;
+  border-bottom: 1px solid #f0f0f0;
 
   &:last-child {
     border-bottom: none;
@@ -96,73 +204,98 @@
 }
 
 .profile-field__label {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  min-width: 140px;
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
 }
 
 .profile-field__value {
   font-size: 0.9rem;
+  color: #111;
   font-weight: 500;
   text-align: right;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  word-break: break-word;
+  max-width: 60%;
+}
 
-  &--locked {
-    color: var(--color-text-muted);
+.profile-link {
+  color: #111;
+  text-decoration: none;
+  border-bottom: 1px solid #e0e0e0;
+
+  &:hover {
+    border-bottom-color: #111;
   }
 }
 
-.lock-icon {
-  font-size: 0.9rem !important;
-  width: 0.9rem !important;
-  height: 0.9rem !important;
-  color: var(--color-border);
-}
-
-// ── Edit mode ─────────────────────────────────────────────────────────────────
+// ── Formulários (mais sutis) ────────────────────────────────────────────────
 
 .profile-form {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 1.25rem;
+}
 
-  // locked fields
-  input:disabled {
-    background: var(--color-bg);
-    color: var(--color-text-muted);
-    cursor: not-allowed;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #555;
+  }
+
+  input, select {
+    padding: 0.7rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: #fff;
+
+    &:focus {
+      outline: none;
+      border-color: #111;
+    }
+
+    &:disabled {
+      background: #f8f8f8;
+      color: #999;
+      cursor: not-allowed;
+    }
+  }
+
+  select {
+    cursor: pointer;
   }
 }
 
-.profile-form__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1rem;
+.form-input--disabled {
+  background: #f8f8f8;
+  color: #999;
 }
-
-// ── Input with prefix (@) ─────────────────────────────────────────────────────
 
 .input-prefix {
   display: flex;
   align-items: center;
-  border: 1px solid var(--color-border);
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
-  transition: border 0.3s;
+  transition: border-color 0.2s;
 
   &:focus-within {
-    border-color: var(--color-primary);
+    border-color: #111;
   }
 
   span {
-    padding: 0.8rem 0.75rem;
-    background: var(--color-bg);
-    color: var(--color-text-muted);
+    padding: 0.7rem 0.75rem;
+    background: #f8f8f8;
+    color: #666;
     font-size: 0.9rem;
-    border-right: 1px solid var(--color-border);
+    border-right: 1px solid #e0e0e0;
   }
 
   input {
@@ -176,51 +309,150 @@
   }
 }
 
-// ── Password match feedback ───────────────────────────────────────────────────
+// ── Campos de Senha ─────────────────────────────────────────────────────────
 
 .password-field {
-  &.match input { border-color: #28a745; }
-  &.mismatch input { border-color: #d9534f; }
-}
-
-.match-badge {
-  display: inline-flex;
+  position: relative;
+  display: flex;
   align-items: center;
-  gap: 0.2rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-  margin-left: 0.5rem;
-  vertical-align: middle;
 
-  mat-icon {
-    font-size: 0.95rem;
-    width: 0.95rem;
-    height: 0.95rem;
+  input {
+    flex: 1;
+    padding-right: 2.5rem;
   }
 
-  &--ok  { color: #28a745; }
-  &--err { color: #d9534f; }
+  &.match input {
+    border-color: #28a745;
+  }
+
+  &.mismatch input {
+    border-color: #dc3545;
+  }
 }
 
-// ── Feedback banners ──────────────────────────────────────────────────────────
+.eye-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  display: flex;
+  align-items: center;
+  padding: 0;
 
-.feedback {
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: #111;
+  }
+}
+
+.password-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  color: #dc3545;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &.success {
+    color: #28a745;
+  }
+}
+
+// ── Botões de Ação ──────────────────────────────────────────────────────────
+
+.profile-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-save {
+  padding: 0.6rem 1.25rem;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #333;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-cancel {
+  padding: 0.6rem 1.25rem;
+  background: none;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #999;
+    color: #111;
+  }
+}
+
+// ── Feedbacks ───────────────────────────────────────────────────────────────
+
+.feedback-success,
+.feedback-error {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
 
-  mat-icon { font-size: 1.1rem; width: 1.1rem; height: 1.1rem; }
-
-  &--success { background: #f0faf3; color: #28a745; }
-  &--error   { background: #fff5f5; color: #d9534f; }
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
 }
 
-// ── States ────────────────────────────────────────────────────────────────────
+.feedback-success {
+  background: #f0fdf4;
+  color: #28a745;
+  border: 1px solid #dcfce7;
+}
+
+.feedback-error {
+  background: #fef2f2;
+  color: #dc3545;
+  border: 1px solid #fee2e2;
+}
+
+// ── Loading e Error ─────────────────────────────────────────────────────────
 
 .profile-loading,
 .profile-error {
@@ -229,25 +461,19 @@
   align-items: center;
   justify-content: center;
   padding: 4rem 0;
-  color: var(--color-text-muted);
+  color: #666;
   gap: 1rem;
 }
 
 .spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-primary);
+  border: 3px solid #e0e0e0;
+  border-top-color: #111;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-.profile-password-hint {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin: 0;
 }
