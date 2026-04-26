@@ -1,0 +1,67 @@
+<section class="event-detail">
+  <div class="section-container">
+    @if (isLoading()) {
+      <div class="event-detail__state">Carregando evento...</div>
+    } @else if (error()) {
+      <div class="event-detail__state event-detail__state--error">
+        <mat-icon>error</mat-icon>
+        <p>{{ error() }}</p>
+        <div class="event-detail__actions">
+          <button class="btn btn--outline" (click)="goBack()">Voltar para eventos</button>
+        </div>
+      </div>
+    } @else if (event()) {
+      <nav class="event-detail__breadcrumb" aria-label="Breadcrumb">
+        <a href="/eventos" class="event-detail__breadcrumb-link">Eventos</a>
+        <span class="event-detail__breadcrumb-separator">/</span>
+        <span class="event-detail__breadcrumb-current">{{ event()!.title }}</span>
+      </nav>
+
+      <article class="event-detail__card">
+        <div class="event-detail__hero">
+          <img [src]="getImageSrc(event())" [alt]="event()!.title" />
+          <div class="event-detail__hero-overlay">
+            <span class="event-detail__category">{{ categoryLabel }}</span>
+            <h1>{{ event()!.title }}</h1>
+            <p>{{ event()!.description }}</p>
+          </div>
+        </div>
+
+        <div class="event-detail__content">
+          <div class="event-detail__main">
+            <div class="event-detail__section">
+              <h2>Sobre o evento</h2>
+              <p>{{ event()!.description }}</p>
+            </div>
+
+            <div class="event-detail__section" *ngIf="event()!.address">
+              <h2>Localização</h2>
+              <p>
+                {{ event()!.address.street }}, {{ event()!.address.number }}<br />
+                {{ event()!.address.neighborhood }} - {{ event()!.address.city }}/{{ event()!.address.state }}<br />
+                CEP {{ event()!.address.postalCode }}
+              </p>
+            </div>
+          </div>
+
+          <aside class="event-detail__sidebar">
+            <div class="event-detail__info-card">
+              <h3>Detalhes</h3>
+              <ul>
+                <li><strong>Início:</strong> {{ formatDateTime(event()!.startsAt) }}</li>
+                <li><strong>Término:</strong> {{ formatDateTime(event()!.endsAt) }}</li>
+                <li><strong>Vagas:</strong> {{ event()!.enrolledCount || 0 }}/{{ event()!.capacity }}</li>
+                <li><strong>Categoria:</strong> {{ categoryLabel }}</li>
+              </ul>
+            </div>
+
+            <div class="event-detail__actions">
+              <button class="btn btn--outline btn--lg event-detail__back-btn" type="button" (click)="goBack()">Voltar</button>
+              <button class="btn btn--primary btn--lg event-detail__join-btn" type="button">Participar</button>
+            </div>
+          </aside>
+        </div>
+      </article>
+    }
+  </div>
+</section>

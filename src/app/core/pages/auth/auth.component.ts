@@ -5,7 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth',
@@ -25,7 +25,14 @@ export class AuthComponent {
   errorMessage = '';
   emailError = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    const mode = this.route.snapshot.data['mode'];
+    this.isLogin = mode !== 'register';
+  }
 
   toggleMode() {
     this.isLogin = !this.isLogin;
@@ -78,7 +85,7 @@ export class AuthComponent {
           console.log('Cadastro realizado', res);
           // Salva token se retornar
           if (res && (res.jwtToken || res.token)) {
-            this.auth.saveToken(res.jwtToken || res.token);
+            this.auth.saveToken(res.jwtToken || res.token, res.userId);
           }
           this.router.navigate(['/']);
         },
@@ -100,7 +107,7 @@ export class AuthComponent {
             return;
           }
 
-          this.auth.saveToken(res.body.jwtToken);
+          this.auth.saveToken(res.body.jwtToken, res.body.userId);
           this.router.navigate(['/']);
         },
         error: err => {
