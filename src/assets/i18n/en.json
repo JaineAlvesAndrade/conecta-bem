@@ -2,7 +2,7 @@
   "auth.title.login": "Welcome back!",
   "auth.title.register": "Create your account",
   "auth.subtitle": "Transform lives through volunteering",
-  "auth.label.name": "Full Name",
+  "auth.label.name": "Full name",
   "auth.label.password": "Password",
   "auth.label.confirmPassword": "Confirm password",
   "auth.error.passwordMismatch": "Passwords do not match",
@@ -27,5 +27,11 @@
   "changePassword.success.title": "Password changed!",
   "changePassword.success.subtitle": "Your password has been updated successfully.",
   "changePassword.success.backToLogin": "Back to login",
-  "changePassword.footer.backToLogin": "Back to login"
+  "changePassword.footer.backToLogin": "Back to login",
+  "auth.label.birthDate": "Birth date",
+  "auth.label.gender": "Gender",
+  "auth.label.phone": "Phone",
+  "auth.error.invalidCpf": "Invalid CPF",
+  "auth.error.invalidCnpj": "Invalid CNPJ",
+  "auth.error.invalidCpfCnpj": "Invalid CPF/CNPJ"
 }

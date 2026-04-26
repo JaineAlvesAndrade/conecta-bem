@@ -2,7 +2,7 @@
   "auth.title.login": "Bem-vindo de volta!",
   "auth.title.register": "Crie sua conta",
   "auth.subtitle": "Transforme vidas através do voluntariado",
-  "auth.label.name": "Nome Completo",
+  "auth.label.name": "Nome completo",
   "auth.label.password": "Senha",
   "auth.label.confirmPassword": "Confirme a senha",
   "auth.error.passwordMismatch": "As senhas não coincidem",
@@ -27,5 +27,11 @@
   "changePassword.success.title": "Senha alterada!",
   "changePassword.success.subtitle": "Sua senha foi atualizada com sucesso.",
   "changePassword.success.backToLogin": "Voltar para o login",
-  "changePassword.footer.backToLogin": "Voltar para o login"
+  "changePassword.footer.backToLogin": "Voltar para o login",
+  "auth.label.birthDate": "Data de nascimento",
+  "auth.label.gender": "Gênero",
+  "auth.label.phone": "Telefone",
+  "auth.error.invalidCpf": "CPF inválido",
+  "auth.error.invalidCnpj": "CNPJ inválido",
+  "auth.error.invalidCpfCnpj": "CPF/CNPJ inválido"
 }
