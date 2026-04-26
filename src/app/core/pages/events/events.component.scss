@@ -160,6 +160,44 @@
       font-size: 0.95rem;
     }
   }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    color: var(--color-text-muted);
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 4rem 0;
+    color: #d32f2f;
+    text-align: center;
+
+    .error-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #d32f2f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
 }
 
 .category-btn {
@@ -182,5 +220,11 @@
     background: var(--color-text);
     color: #fff;
     border-color: var(--color-text);
+
+    &:hover {
+      background: #fff;
+      border-color: var(--color-text);
+      color: var(--color-text);
+    }
   }
 }

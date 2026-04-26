@@ -34,9 +34,9 @@ export class EventsComponent implements OnInit {
   };
 
   categories = [
-    { value: 'todos',    label: 'Todos' },
+    { value: 'todos', label: 'Todos' },
     { value: 'educacao', label: 'Educação' },
-    { value: 'saude',    label: 'Saúde' },
+    { value: 'saude', label: 'Saúde' },
     { value: 'ambiente', label: 'Meio Ambiente' },
   ];
 

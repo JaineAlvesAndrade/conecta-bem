@@ -9,7 +9,7 @@
             </div>
         </header>
 
-            <form (submit)="onSubmit()">
+        <form (submit)="onSubmit()">
             <div *ngIf="!isLogin" class="form-group">
                 <label>{{ 'auth.label.name' | translate }}</label>
                 <input type="text" [(ngModel)]="name" name="name">
@@ -17,7 +17,8 @@
 
             <div class="form-group">
                 <label>{{ 'auth.label.email' | translate }}</label>
-                <input type="email" [(ngModel)]="email" (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()" name="email" required>
+                <input type="email" [(ngModel)]="email" (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()"
+                    name="email" required>
                 <div class="error" *ngIf="emailError">
                     {{ emailError | translate }}
                 </div>
@@ -27,7 +28,8 @@
                 <label>{{ 'auth.label.password' | translate }}</label>
                 <div class="password-field">
                     <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required>
-                    <button type="button" class="eye" (click)="toggleShowPassword()" aria-label="Toggle password visibility">
+                    <button type="button" class="eye" (click)="toggleShowPassword()"
+                        aria-label="Toggle password visibility">
                         <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                     </button>
                 </div>
@@ -37,8 +39,10 @@
             <div *ngIf="!isLogin" class="form-group password-group">
                 <label>{{ 'auth.label.confirmPassword' | translate }}</label>
                 <div class="password-field">
-                    <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword" required>
-                    <button type="button" class="eye" (click)="toggleShowConfirm()" aria-label="Toggle confirm password visibility">
+                    <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword"
+                        name="confirmPassword" required>
+                    <button type="button" class="eye" (click)="toggleShowConfirm()"
+                        aria-label="Toggle confirm password visibility">
                         <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
                     </button>
                 </div>
@@ -56,6 +60,10 @@
         <footer>
             <a (click)="toggleMode()">
                 {{ isLogin ? ('auth.footer.noAccount' | translate) : ('auth.footer.haveAccount' | translate) }}
+            </a>
+            <br />
+            <a (click)="goToChangePassword()">
+                {{ 'auth.footer.forgotPassword' | translate }}
             </a>
         </footer>
     </div>
