@@ -8,6 +8,12 @@ export interface RegisterPayload {
   fullName: string;
   username: string;
   password: string;
+  cpfCnpj: string;
+  birthDate: string;
+  gender: string; 
+  instagram?: string; 
+  linkedin?: string;
+  phone: string;
 }
 
 export interface LoginPayload {

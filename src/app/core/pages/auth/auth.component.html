@@ -1,70 +1,150 @@
 <div class="auth-container">
-    <div class="auth-card">
-        <header>
-            <img src="/assets/logo.png" alt="ConectaBem" class="logo">
-            <h2>{{ (isLogin ? 'auth.title.login' : 'auth.title.register') | translate }}</h2>
-            <p>{{ 'auth.subtitle' | translate }}</p>
-            <div class="error" *ngIf="errorMessage">
-                {{ errorMessage | translate }}
-            </div>
-        </header>
+  <div class="auth-card" [class.auth-card--register]="!isLogin">
+    <header>
+      <img src="/assets/logo.png" alt="ConectaBem" class="logo">
+      <h2>{{ (isLogin ? 'auth.title.login' : 'auth.title.register') | translate }}</h2>
+      <p>{{ 'auth.subtitle' | translate }}</p>
+      <div class="error" *ngIf="errorMessage">
+        {{ errorMessage | translate }}
+      </div>
+    </header>
 
-        <form (submit)="onSubmit()">
-            <div *ngIf="!isLogin" class="form-group">
-                <label>{{ 'auth.label.name' | translate }}</label>
-                <input type="text" [(ngModel)]="name" name="name">
-            </div>
+    <form (submit)="onSubmit()">
 
-            <div class="form-group">
-                <label>{{ 'auth.label.email' | translate }}</label>
-                <input type="email" [(ngModel)]="email" (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()"
-                    name="email" required>
-                <div class="error" *ngIf="emailError">
-                    {{ emailError | translate }}
-                </div>
-            </div>
+      <!-- ── LOGIN ── -->
+      <ng-container *ngIf="isLogin">
+        <div class="form-group">
+          <label>{{ 'auth.label.email' | translate }}</label>
+          <input type="email" [(ngModel)]="email"
+            (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()"
+            name="email" required>
+          <div class="error" *ngIf="emailError">{{ emailError | translate }}</div>
+        </div>
 
-            <div class="form-group password-group">
-                <label>{{ 'auth.label.password' | translate }}</label>
-                <div class="password-field">
-                    <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required>
-                    <button type="button" class="eye" (click)="toggleShowPassword()"
-                        aria-label="Toggle password visibility">
-                        <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Confirm password only on register -->
-            <div *ngIf="!isLogin" class="form-group password-group">
-                <label>{{ 'auth.label.confirmPassword' | translate }}</label>
-                <div class="password-field">
-                    <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword"
-                        name="confirmPassword" required>
-                    <button type="button" class="eye" (click)="toggleShowConfirm()"
-                        aria-label="Toggle confirm password visibility">
-                        <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                </div>
-                <div class="error" *ngIf="confirmPassword && password !== confirmPassword">
-                    {{ 'auth.error.passwordMismatch' | translate }}
-                </div>
-            </div>
-
-
-            <button type="submit" class="btn-primary">
-                {{ isLogin ? ('auth.button.login' | translate) : ('auth.button.register' | translate) }}
+        <div class="form-group password-group">
+          <label>{{ 'auth.label.password' | translate }}</label>
+          <div class="password-field">
+            <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required>
+            <button type="button" class="eye" (click)="toggleShowPassword()">
+              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-        </form>
+          </div>
+        </div>
+      </ng-container>
 
-        <footer>
-            <a (click)="toggleMode()">
-                {{ isLogin ? ('auth.footer.noAccount' | translate) : ('auth.footer.haveAccount' | translate) }}
-            </a>
-            <br />
-            <a (click)="goToChangePassword()">
-                {{ 'auth.footer.forgotPassword' | translate }}
-            </a>
-        </footer>
-    </div>
+      <!-- ── REGISTER ── -->
+      <ng-container *ngIf="!isLogin">
+
+        <div class="register-section-label">Dados pessoais</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'auth.label.name' | translate }} <span class="required">*</span></label>
+            <input type="text" [(ngModel)]="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label>CPF / CNPJ <span class="required">*</span></label>
+            <input type="text" [(ngModel)]="cpfCnpj" name="cpfCnpj"
+              (input)="onCpfCnpjInput()" (blur)="validateCpfCnpj()"
+              placeholder="000.000.000-00" maxlength="18" required>
+            <div class="error" *ngIf="cpfCnpjError">{{ cpfCnpjError | translate }}</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'auth.label.birthDate' | translate }} <span class="required">*</span></label>
+            <input type="date" [(ngModel)]="birthDate" name="birthDate" required>
+          </div>
+          <div class="form-group">
+            <label>{{ 'auth.label.gender' | translate }}</label>
+            <select [(ngModel)]="gender" name="gender">
+              <option value="">Prefiro não informar</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Feminino">Feminino</option>
+              <option value="Não-binário">Não-binário</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="register-section-label">Contato</div>
+
+        <div class="form-group">
+          <label>{{ 'auth.label.email' | translate }} <span class="required">*</span></label>
+          <input type="email" [(ngModel)]="email"
+            (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()"
+            name="email" required>
+          <div class="error" *ngIf="emailError">{{ emailError | translate }}</div>
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'auth.label.phone' | translate }}</label>
+          <input type="tel" [(ngModel)]="phone" name="phone"
+            (input)="onPhoneInput()" placeholder="(00) 00000-0000" maxlength="15">
+        </div>
+
+        <div class="register-section-label">Redes sociais <span class="optional">(opcional)</span></div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Instagram</label>
+            <div class="input-prefix">
+              <span>&#64;</span>
+              <input type="text" [(ngModel)]="instagram" name="instagram" placeholder="seu_usuario">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>LinkedIn</label>
+            <input type="url" [(ngModel)]="linkedin" name="linkedin" placeholder="linkedin.com/in/...">
+          </div>
+        </div>
+
+        <div class="register-section-label">Senha</div>
+
+        <div class="form-group password-group">
+          <label>{{ 'auth.label.password' | translate }} <span class="required">*</span></label>
+          <div class="password-field">
+            <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required>
+            <button type="button" class="eye" (click)="toggleShowPassword()">
+              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group password-group">
+          <label>
+            {{ 'auth.label.confirmPassword' | translate }} <span class="required">*</span>
+            <span class="match-badge match-badge--ok" *ngIf="!passwordMismatch && confirmPassword">
+              <mat-icon>check_circle</mat-icon> Senhas iguais
+            </span>
+            <span class="match-badge match-badge--err" *ngIf="passwordMismatch">
+              <mat-icon>cancel</mat-icon> Senhas diferentes
+            </span>
+          </label>
+          <div class="password-field" [class.match]="!passwordMismatch && confirmPassword" [class.mismatch]="passwordMismatch">
+            <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+            <button type="button" class="eye" (click)="toggleShowConfirm()">
+              <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <button type="submit" class="btn-primary"
+        [disabled]="!isLogin && (passwordMismatch || !!cpfCnpjError)">
+        {{ isLogin ? ('auth.button.login' | translate) : ('auth.button.register' | translate) }}
+      </button>
+    </form>
+
+    <footer>
+      <a (click)="toggleMode()">
+        {{ isLogin ? ('auth.footer.noAccount' | translate) : ('auth.footer.haveAccount' | translate) }}
+      </a>
+      <a *ngIf="isLogin" (click)="goToChangePassword()">
+        {{ 'auth.footer.forgotPassword' | translate }}
+      </a>
+    </footer>
+  </div>
 </div>
