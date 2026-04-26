@@ -1,15 +1,10 @@
-// Base styles (auth-container, auth-card, form-group, etc.) live in global styles.scss
-
 .auth-container {
-  padding: 2rem 1rem; // margem do navbar/footer
+  padding: 2rem 1rem;
 }
 
-// Register card é mais largo para acomodar os campos em grid
 .auth-card--register {
   max-width: 620px;
 }
-
-// ── Seções do formulário ──────────────────────────────────────────────────────
 
 .register-section-label {
   font-size: 0.75rem;
@@ -32,8 +27,6 @@
   }
 }
 
-// ── Grid de dois campos lado a lado ──────────────────────────────────────────
-
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -44,14 +37,10 @@
   }
 }
 
-// ── Campo obrigatório ─────────────────────────────────────────────────────────
-
 .required {
   color: #d9534f;
   margin-left: 2px;
 }
-
-// ── Input com prefixo (@) ─────────────────────────────────────────────────────
 
 .input-prefix {
   display: flex;
@@ -85,8 +74,6 @@
   }
 }
 
-// ── Password match feedback ───────────────────────────────────────────────────
-
 .password-field {
   &.match input { border-color: #28a745; }
   &.mismatch input { border-color: #d9534f; }
@@ -112,8 +99,6 @@
   &--ok  { color: #28a745; }
   &--err { color: #d9534f; }
 }
-
-// ── Footer ────────────────────────────────────────────────────────────────────
 
 footer {
   display: flex;

@@ -32,7 +32,6 @@ export class NavbarComponent {
     this.userMenuOpen = false;
   }
 
-  // Fecha o dropdown ao clicar fora
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;

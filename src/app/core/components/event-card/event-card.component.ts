@@ -106,7 +106,6 @@ export class EventCardComponent {
         const eventDate = new Date(this.event.startsAt);
         const daysUntilEvent = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         
-        // Evento é considerado urgente se faltar menos de 7 dias
         return daysUntilEvent >= 0 && daysUntilEvent <= 7;
     }
 

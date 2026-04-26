@@ -16,8 +16,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class AuthComponent {
   isLogin = true;
-
-  // Login fields
   email = '';
   password = '';
   showPassword = false;
@@ -111,7 +109,6 @@ export class AuthComponent {
     return !!this.confirmPassword && this.password !== this.confirmPassword;
   }
 
-  // Auto-mask CPF/CNPJ as the user types
   onCpfCnpjInput() {
     const digits = this.stripMask(this.cpfCnpj);
     if (digits.length <= 11) {
@@ -129,7 +126,6 @@ export class AuthComponent {
     this.cpfCnpjError = '';
   }
 
-  // Auto-mask phone
   onPhoneInput() {
     const digits = this.stripMask(this.phone);
     if (digits.length <= 10) {
@@ -142,8 +138,6 @@ export class AuthComponent {
         .replace(/(\d{5})(\d)/, '$1-$2');
     }
   }
-
-  // ── Submit ──────────────────────────────────────────────────────────────────
 
   onSubmit() {
     this.errorMessage = '';

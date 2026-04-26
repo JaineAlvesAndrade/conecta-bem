@@ -1,5 +1,3 @@
-// profile.component.ts (atualizado)
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -27,8 +25,6 @@ export class ProfileComponent implements OnInit {
     Gender = Gender;
     saveState: SaveState = 'idle';
     errorMessage = '';
-    
-    // Password form fields
     showPasswordForm = false;
     currentPassword = '';
     newPassword = '';

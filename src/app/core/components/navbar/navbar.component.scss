@@ -71,8 +71,6 @@
     justify-self: end;
   }
 
-  // ── User dropdown ──────────────────────────────────────────────────────────
-
   &__user {
     position: relative;
   }
@@ -162,8 +160,6 @@
     background: var(--color-border);
     margin: 0.25rem 0;
   }
-
-  // ── Hamburger ──────────────────────────────────────────────────────────────
 
   &__hamburger {
     display: none;
