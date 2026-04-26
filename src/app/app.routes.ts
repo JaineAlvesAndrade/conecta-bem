@@ -3,6 +3,7 @@ import { AuthComponent } from './core/pages/auth/auth.component';
 import { HomeComponent } from './core/pages/home/home.component';
 import { EventsComponent } from './core/pages/events/events.component';
 import { ChangePasswordComponent } from './core/pages/change-password/change-password.component';
+import { ProfileComponent } from './core/pages/profile/profile.component';
 
 export const routes: Routes = [
     { 
@@ -24,5 +25,9 @@ export const routes: Routes = [
     {
         path: 'alterar-senha',
         component: ChangePasswordComponent
+    },
+    { 
+        path: 'perfil', 
+        component: ProfileComponent 
     }
 ];

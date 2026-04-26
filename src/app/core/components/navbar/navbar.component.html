@@ -11,7 +11,6 @@
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="navbar__link">
         Início
       </a>
-
       <a routerLink="/eventos" routerLinkActive="active" class="navbar__link">
         Explorar Eventos
       </a>
@@ -19,17 +18,29 @@
 
     <div class="navbar__actions">
       @if (authService.isLoggedIn()) {
-      <!-- Usuário logado -->
-      <button class="navbar__user-menu" (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Sair</span>
-      </button>
+        <!-- Usuário logado -->
+        <div class="navbar__user" [class.navbar__user--open]="userMenuOpen" (clickOutside)="closeUserMenu()">
+          <button class="navbar__user-btn" (click)="toggleUserMenu()" aria-label="Menu do usuário">
+            <mat-icon>person</mat-icon>
+          </button>
+          <div class="navbar__dropdown" *ngIf="userMenuOpen">
+            <a class="navbar__dropdown-item" (click)="goToProfile()">
+              <mat-icon>manage_accounts</mat-icon>
+              Editar perfil
+            </a>
+            <div class="navbar__dropdown-divider"></div>
+            <a class="navbar__dropdown-item navbar__dropdown-item--danger" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              Sair
+            </a>
+          </div>
+        </div>
       } @else {
-      <!-- Não logado -->
-      <a (click)="goToLogin()" class="navbar__link">Entrar</a>
-      <a (click)="goToSubscription()" class="btn btn--primary btn--sm">
-        Cadastre-se
-      </a>
+        <!-- Não logado -->
+        <a (click)="goToLogin()" class="navbar__link">Entrar</a>
+        <a (click)="goToSubscription()" class="btn btn--primary btn--sm">
+          Cadastre-se
+        </a>
       }
     </div>
 
