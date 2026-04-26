@@ -26,6 +26,7 @@ export class AuthService {
   private readonly base = `${environment.baseApiUrl}/auth`;
   private readonly storageKey = 'jwtToken';
   private readonly storageExpiryKey = 'jwtTokenExpiry';
+  private readonly storageUserIdKey = 'userId';
   private readonly tokenLifetimeMs = 12 * 60 * 60 * 1000; // 12 hours
 
   // Signal para rastrear estado de autenticação
@@ -46,17 +47,24 @@ export class AuthService {
     return this.http.post<any>(`${this.base}/login`, payload, { observe: 'response' });
   }
 
-  /**
-   * Save token and expiry to localStorage
-   */
-  saveToken(token: string) {
+  saveToken(token: string, userId?: string | number | null) {
     if (!token) {
       return;
     }
+
     localStorage.setItem(this.storageKey, token);
     const expiry = Date.now() + this.tokenLifetimeMs;
     localStorage.setItem(this.storageExpiryKey, expiry.toString());
+
+    if (userId !== undefined && userId !== null && `${userId}`.trim() !== '') {
+      localStorage.setItem(this.storageUserIdKey, String(userId));
+    }
+
     this.isLoggedIn.set(true);
+  }
+
+  getUserId(): string | null {
+    return localStorage.getItem(this.storageUserIdKey);
   }
 
   getToken(): string | null {
@@ -79,6 +87,7 @@ export class AuthService {
   clearToken() {
     localStorage.removeItem(this.storageKey);
     localStorage.removeItem(this.storageExpiryKey);
+    localStorage.removeItem(this.storageUserIdKey);
     this.isLoggedIn.set(false);
   }
 

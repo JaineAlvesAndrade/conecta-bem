@@ -5,7 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth',
@@ -24,8 +24,6 @@ export class AuthComponent {
   showConfirm = false;
   errorMessage = '';
   emailError = '';
-
-  // Register fields
   name = '';
   confirmPassword = '';
   cpfCnpj = '';
@@ -34,15 +32,18 @@ export class AuthComponent {
   phone = '';
   instagram = '';
   linkedin = '';
-
-  // Validation errors
   cpfCnpjError = '';
 
-  constructor(private auth: AuthService, private router: Router, private route: ActivatedRoute) {
-    this.isLogin = this.route.snapshot.url[0]?.path !== 'cadastro';
-  }
 
-  // ── Mode ────────────────────────────────────────────────────────────────────
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    const mode = this.route.snapshot.data['mode'];
+    this.isLogin = mode !== 'register';
+     this.isLogin = this.route.snapshot.url[0]?.path !== 'cadastro';
+  }
 
   toggleMode() {
     this.isLogin = !this.isLogin;
@@ -56,8 +57,6 @@ export class AuthComponent {
     this.showPassword = false; this.showConfirm = false;
     this.errorMessage = ''; this.emailError = ''; this.cpfCnpjError = '';
   }
-
-  // ── Validation ──────────────────────────────────────────────────────────────
 
   private isEmailValid(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -174,7 +173,7 @@ export class AuthComponent {
       }).subscribe({
         next: (res: any) => {
           if (res && (res.jwtToken || res.token)) {
-            this.auth.saveToken(res.jwtToken || res.token);
+            this.auth.saveToken(res.jwtToken || res.token, res.userId);
           }
           this.router.navigate(['/']);
         },
@@ -187,7 +186,8 @@ export class AuthComponent {
             this.errorMessage = 'auth.error.invalidCredentials';
             return;
           }
-          this.auth.saveToken(res.body.jwtToken);
+
+          this.auth.saveToken(res.body.jwtToken, res.body.userId);
           this.router.navigate(['/']);
         },
         error: err => {

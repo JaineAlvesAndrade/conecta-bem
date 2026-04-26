@@ -1,7 +1,7 @@
 <div class="modal-overlay" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Criar Novo Evento</h2>
+      <h2>{{ isEditMode ? 'Editar Evento' : 'Criar Novo Evento' }}</h2>
       <button class="modal-close" (click)="closeModal()" aria-label="Fechar">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -49,6 +49,28 @@
         ></textarea>
         @if (getFieldError('description', eventForm)) {
           <span class="form-error">{{ getFieldError('description', eventForm) }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="image">Imagem do Evento</label>
+        <input
+          id="image"
+          type="file"
+          accept="image/*"
+          class="form-input form-input--file"
+          (change)="onImageSelected($event)"
+        />
+        <small class="form-help">Opcional. Envie uma imagem para destacar o evento na lista e no detalhe.</small>
+
+        <div class="image-preview">
+          <img [src]="imagePreview()" [alt]="eventForm.get('title')?.value || 'Pré-visualização da imagem'" />
+        </div>
+
+        @if (isEditMode && (eventToEdit?.imageUrl || eventToEdit?.image)) {
+          <button type="button" class="btn btn--outline btn--sm image-remove-btn" (click)="requestDeleteImage()" [disabled]="isDeletingImage()">
+            {{ isDeletingImage() ? 'Removendo...' : 'Remover imagem' }}
+          </button>
         }
       </div>
 
@@ -296,12 +318,30 @@
         </button>
         <button type="submit" class="btn btn--primary" [disabled]="eventForm.invalid || isSubmitting() || isLoadingAddresses()">
           @if (isSubmitting()) {
-            <span>Criando...</span>
+            <span>{{ isEditMode ? 'Salvando...' : 'Criando...' }}</span>
           } @else {
-            <span>Criar Evento</span>
+            <span>{{ isEditMode ? 'Salvar Alterações' : 'Criar Evento' }}</span>
           }
         </button>
       </div>
+
+      @if (showDeleteImageConfirm()) {
+        <div class="image-delete-confirm" (click)="cancelDeleteImage()">
+          <div class="image-delete-confirm__modal" (click)="$event.stopPropagation()">
+            <h3>Remover imagem?</h3>
+            <p>Essa ação não é reversível. A imagem será removida permanentemente do evento.</p>
+
+            <div class="image-delete-confirm__actions">
+              <button type="button" class="btn btn--outline" (click)="cancelDeleteImage()" [disabled]="isDeletingImage()">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn--primary" (click)="confirmDeleteImage()" [disabled]="isDeletingImage()">
+                {{ isDeletingImage() ? 'Removendo...' : 'Sim, remover' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </form>
   </div>
 </div>

@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output, signal, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, Input, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EventsService } from '../../services/events.service';
+import { EventsService, EventInput } from '../../services/events.service';
 import { AddressService } from '../../services/address.service';
 import { Event, EventCategory, EventCategoryLabels } from '../../models/event.model';
 import { Address } from '../../models/address.model';
@@ -14,8 +14,10 @@ import { Address } from '../../models/address.model';
   styleUrls: ['./create-event-modal.component.scss']
 })
 export class CreateEventModalComponent implements OnInit {
+  @Input() eventToEdit: Event | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() eventCreated = new EventEmitter<Event>();
+  @Output() eventUpdated = new EventEmitter<Event>();
 
   eventForm: FormGroup;
   addressForm: FormGroup;
@@ -27,6 +29,10 @@ export class CreateEventModalComponent implements OnInit {
   showCreateAddressForm = signal(false);
   isCreatingAddress = signal(false);
   addressError = signal<string | null>(null);
+  selectedImage = signal<File | null>(null);
+  imagePreview = signal<string>('/assets/no_image.png');
+  isDeletingImage = signal(false);
+  showDeleteImageConfirm = signal(false);
 
   categories = Object.values(EventCategory).map(cat => ({
     value: cat,
@@ -63,6 +69,39 @@ export class CreateEventModalComponent implements OnInit {
 
   ngOnInit() {
     this.loadAddresses();
+    this.prefillFormIfEditing();
+  }
+
+  get isEditMode(): boolean {
+    return !!this.eventToEdit;
+  }
+
+  private prefillFormIfEditing() {
+    if (!this.eventToEdit) {
+      return;
+    }
+
+    this.eventForm.patchValue({
+      title: this.eventToEdit.title,
+      description: this.eventToEdit.description,
+      addressId: this.eventToEdit.address?.id || '',
+      category: this.eventToEdit.category,
+      startsAt: this.formatDateForInput(this.eventToEdit.startsAt),
+      endsAt: this.formatDateForInput(this.eventToEdit.endsAt),
+      capacity: this.eventToEdit.capacity
+    });
+
+    this.imagePreview.set(this.eventToEdit.imageUrl || this.eventToEdit.image || '/assets/no_image.png');
+  }
+
+  private formatDateForInput(dateValue: string): string {
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    const offsetMs = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
   }
 
   private loadAddresses() {
@@ -86,6 +125,24 @@ export class CreateEventModalComponent implements OnInit {
       this.addressForm.reset({ country: 'Brasil' });
       this.addressError.set(null);
     }
+  }
+
+  onImageSelected(event: any) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    this.selectedImage.set(file);
+
+    if (!file) {
+      this.imagePreview.set(this.eventToEdit?.imageUrl || this.eventToEdit?.image || '/assets/no_image.png');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview.set(typeof reader.result === 'string' ? reader.result : '/assets/no_image.png');
+    };
+    reader.readAsDataURL(file);
   }
 
   onCreateAddress() {
@@ -119,6 +176,66 @@ export class CreateEventModalComponent implements OnInit {
     });
   }
 
+  requestDeleteImage() {
+    if (!this.isEditMode || !this.eventToEdit || this.isDeletingImage()) {
+      return;
+    }
+
+    this.showDeleteImageConfirm.set(true);
+  }
+
+  cancelDeleteImage() {
+    if (this.isDeletingImage()) {
+      return;
+    }
+
+    this.showDeleteImageConfirm.set(false);
+  }
+
+  confirmDeleteImage() {
+    if (!this.isEditMode || !this.eventToEdit || this.isDeletingImage()) {
+      return;
+    }
+
+    this.isDeletingImage.set(true);
+    this.showDeleteImageConfirm.set(false);
+
+    this.eventsService.deleteEventImage(this.eventToEdit.id).subscribe({
+      next: (response) => {
+        const currentEvent = this.eventToEdit;
+        if (!currentEvent) {
+          this.isDeletingImage.set(false);
+          return;
+        }
+
+        const updatedImageUrl = response && typeof response === 'object' && 'imageUrl' in response
+          ? (response as Event).imageUrl
+          : undefined;
+
+        const updatedImage = response && typeof response === 'object' && 'image' in response
+          ? (response as Event).image
+          : undefined;
+
+        const updatedEvent: Event = {
+          ...currentEvent,
+          imageUrl: updatedImageUrl,
+          image: updatedImage
+        };
+
+        this.imagePreview.set(updatedImageUrl || updatedImage || '/assets/no_image.png');
+        this.selectedImage.set(null);
+        this.eventToEdit = updatedEvent;
+        this.eventUpdated.emit(updatedEvent);
+        this.isDeletingImage.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao remover imagem:', err);
+        this.error.set('Falha ao remover imagem. Tente novamente.');
+        this.isDeletingImage.set(false);
+      }
+    });
+  }
+
   onSubmit() {
     if (this.eventForm.invalid) {
       this.error.set('Preencha todos os campos corretamente');
@@ -129,25 +246,34 @@ export class CreateEventModalComponent implements OnInit {
     this.error.set(null);
 
     const formValue = this.eventForm.value;
-    const eventData = {
+    const eventData: EventInput = {
       title: formValue.title,
       description: formValue.description,
       addressId: formValue.addressId,
       category: formValue.category,
       startsAt: new Date(formValue.startsAt).toISOString().slice(0, -1),
       endsAt: new Date(formValue.endsAt).toISOString().slice(0, -1),
-      capacity: parseInt(formValue.capacity, 10)
+      capacity: parseInt(formValue.capacity, 10),
+      image: this.selectedImage()
     };
 
-    this.eventsService.createEvent(eventData).subscribe({
-      next: (newEvent) => {
+    const request$ = this.isEditMode && this.eventToEdit
+      ? this.eventsService.updateEvent(this.eventToEdit.id, eventData)
+      : this.eventsService.createEvent(eventData);
+
+    request$.subscribe({
+      next: (savedEvent) => {
         this.isSubmitting.set(false);
-        this.eventCreated.emit(newEvent);
+        if (this.isEditMode) {
+          this.eventUpdated.emit(savedEvent);
+        } else {
+          this.eventCreated.emit(savedEvent);
+        }
         this.closeModal();
       },
       error: (err) => {
-        console.error('Erro ao criar evento:', err);
-        this.error.set('Falha ao criar evento. Tente novamente.');
+        console.error('Erro ao salvar evento:', err);
+        this.error.set(this.isEditMode ? 'Falha ao atualizar evento. Tente novamente.' : 'Falha ao criar evento. Tente novamente.');
         this.isSubmitting.set(false);
       }
     });
@@ -159,6 +285,10 @@ export class CreateEventModalComponent implements OnInit {
     this.error.set(null);
     this.addressError.set(null);
     this.showCreateAddressForm.set(false);
+    this.showDeleteImageConfirm.set(false);
+    this.isDeletingImage.set(false);
+    this.selectedImage.set(null);
+    this.imagePreview.set(this.eventToEdit?.imageUrl || this.eventToEdit?.image || '/assets/no_image.png');
     this.close.emit();
   }
 

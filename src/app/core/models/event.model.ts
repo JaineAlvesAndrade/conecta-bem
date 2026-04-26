@@ -20,6 +20,7 @@ export const EventCategoryLabels: Record<EventCategory, string> = {
 
 export interface Event {
   id: string;
+  ownerId?: string;
   title: string;
   description: string;
   address: Address;
@@ -28,5 +29,6 @@ export interface Event {
   endsAt: string;
   capacity: number;
   enrolledCount?: number;
+  image?: string;
   imageUrl?: string;
 }
