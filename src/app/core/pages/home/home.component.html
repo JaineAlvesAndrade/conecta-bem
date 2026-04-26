@@ -4,8 +4,10 @@
     <h1>Transforme vidas através do voluntariado</h1>
     <p>Junte-se a nós e faça a diferença na vida de milhares de pessoas. Nossos programas beneficentes conectam voluntários dedicados a causas que realmente importam.</p>
     <div class="hero__actions">
-      <a routerLink="/login" class="btn btn--primary btn--lg">Torne-se Voluntário</a>
-      <a routerLink="/eventos" class="btn btn--outline btn--lg">Explorar Eventos</a>
+      @if (!isLoggedIn) {
+        <a routerLink="/login" class="btn btn--primary btn--lg">Torne-se Voluntário</a>
+      }
+      <a routerLink="/eventos" class="btn btn--outline btn--lg" [class.btn--full]="isLoggedIn">Explorar Eventos</a>
     </div>
   </div>
   <div class="hero__image">
@@ -26,7 +28,13 @@
   <div class="section-container">
     <div class="stats__grid">
       @for (stat of stats; track stat.label) {
-        <app-stat-card [value]="stat.value" [label]="stat.label" [icon]="stat.icon" />
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <mat-icon>{{ stat.icon }}</mat-icon>
+          </div>
+          <div class="stat-card__value">{{ stat.value }}</div>
+          <div class="stat-card__label">{{ stat.label }}</div>
+        </div>
       }
     </div>
   </div>
@@ -38,7 +46,9 @@
     <div class="pillars__grid">
       @for (pillar of pillars; track pillar.title) {
         <div class="pillar">
-          <div class="pillar__icon" [innerHTML]="pillar.icon"></div>
+          <div class="pillar__icon">
+            <mat-icon>{{ pillar.icon }}</mat-icon>
+          </div>
           <h3>{{ pillar.title }}</h3>
           <p>{{ pillar.desc }}</p>
         </div>

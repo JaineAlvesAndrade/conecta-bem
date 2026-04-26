@@ -5,11 +5,12 @@ import { EventsService, EventInput } from '../../services/events.service';
 import { AddressService } from '../../services/address.service';
 import { Event, EventCategory, EventCategoryLabels } from '../../models/event.model';
 import { Address } from '../../models/address.model';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-create-event-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './create-event-modal.component.html',
   styleUrls: ['./create-event-modal.component.scss']
 })
