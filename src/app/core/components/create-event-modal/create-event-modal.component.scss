@@ -140,6 +140,78 @@
       box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
     }
   }
+
+  &--file {
+    padding: 0.65rem 0.85rem;
+    background: #fff;
+  }
+}
+
+.form-help {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.image-preview {
+  margin-top: 0.75rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+
+  img {
+    display: block;
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+  }
+}
+
+.image-remove-btn {
+  margin-top: 0.75rem;
+}
+
+.image-delete-confirm {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1200;
+
+  &__modal {
+    width: 100%;
+    max-width: 460px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+
+    h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1.2rem;
+      color: #111;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+      line-height: 1.6;
+    }
+  }
+
+  &__actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+    }
+  }
 }
 
 .form-error {
@@ -233,10 +305,10 @@
 }
 
 .btn {
-  padding: 1rem 2rem;
+  padding: 1.1rem 2.2rem;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -275,7 +347,7 @@
   }
 
   &--sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    padding: 0.7rem 1.15rem;
+    font-size: 0.92rem;
   }
 }

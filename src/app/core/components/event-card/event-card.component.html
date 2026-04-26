@@ -1,7 +1,7 @@
 <article class="event-card">
   <div class="event-card__image-wrap">
     <img 
-      [src]="event.imageUrl || 'https://via.placeholder.com/400x250'" 
+      [src]="getImageSrc(event)" 
       [alt]="event.title" 
       loading="lazy" 
     />
@@ -38,7 +38,10 @@
 
     <div class="event-card__actions">
       <button class="btn btn--primary btn--sm">Participar</button>
-      <button class="btn btn--outline btn--sm">Ver Detalhes</button>
+      <button class="btn btn--outline btn--sm" [routerLink]="['/eventos', event.id]">Ver Detalhes</button>
+      @if (canEdit) {
+        <button class="btn btn--outline btn--sm" (click)="onEditClick()">Editar</button>
+      }
     </div>
   </div>
 </article>

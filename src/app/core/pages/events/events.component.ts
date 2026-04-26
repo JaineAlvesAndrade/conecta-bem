@@ -24,6 +24,7 @@ export class EventsComponent implements OnInit {
   isLoading = signal(true);
   error = signal<string | null>(null);
   showCreateModal = signal(false);
+  selectedEventToEdit = signal<Event | null>(null);
 
   // Mapeamento entre valores UI e EventCategory
   private categoryMap: Record<string, EventCategory | 'todos'> = {
@@ -78,12 +79,44 @@ export class EventsComponent implements OnInit {
 
   onModalClose() {
     this.showCreateModal.set(false);
+    this.selectedEventToEdit.set(null);
   }
 
   onEventCreated(newEvent: Event) {
     // Adiciona o novo evento à lista e fecha o modal
     this.allEvents.update(events => [newEvent, ...events]);
     this.showCreateModal.set(false);
+    this.selectedEventToEdit.set(null);
+  }
+
+  onEventUpdated(updatedEvent: Event) {
+    this.allEvents.update(events =>
+      events.map(event => event.id === updatedEvent.id ? updatedEvent : event)
+    );
+    this.showCreateModal.set(false);
+    this.selectedEventToEdit.set(null);
+  }
+
+  openEditEventModal(event: Event) {
+    if (!this.canEditEvent(event)) {
+      return;
+    }
+
+    this.selectedEventToEdit.set(event);
+    this.showCreateModal.set(true);
+  }
+
+  canEditEvent(event: Event): boolean {
+    if (!this.authService.isLoggedIn()) {
+      return false;
+    }
+
+    const loggedUserId = this.authService.getUserId();
+    if (!loggedUserId || !event.ownerId) {
+      return false;
+    }
+
+    return String(event.ownerId) === String(loggedUserId);
   }
 
   private loadPublicEvents() {

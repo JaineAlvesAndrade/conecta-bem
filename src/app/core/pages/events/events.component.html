@@ -73,7 +73,11 @@
       <!-- List -->
       <div class="events-page__list">
         @for (event of filteredEvents(); track event.id) {
-          <app-event-card [event]="event" />
+          <app-event-card
+            [event]="event"
+            [canEdit]="canEditEvent(event)"
+            (edit)="openEditEventModal(event)"
+          />
         } @empty {
           <div class="events-page__empty">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -94,7 +98,9 @@
 <!-- Modal para criar evento -->
 @if (showCreateModal()) {
   <app-create-event-modal
+    [eventToEdit]="selectedEventToEdit()"
     (close)="onModalClose()"
     (eventCreated)="onEventCreated($event)"
+    (eventUpdated)="onEventUpdated($event)"
   />
 }
