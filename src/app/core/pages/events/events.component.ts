@@ -26,7 +26,6 @@ export class EventsComponent implements OnInit {
   showCreateModal = signal(false);
   selectedEventToEdit = signal<Event | null>(null);
 
-  // Mapeamento entre valores UI e EventCategory
   private categoryMap: Record<string, EventCategory | 'todos'> = {
     'todos': 'todos',
     'educacao': EventCategory.EDUCATION,

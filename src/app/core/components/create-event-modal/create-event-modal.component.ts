@@ -157,7 +157,6 @@ export class CreateEventModalComponent implements OnInit {
 
     this.addressService.createAddress(this.addressForm.value).subscribe({
       next: (newAddress) => {
-        // Adiciona o novo endereço à lista
         this.addresses.update(addrs => [...addrs, newAddress]);
         
         // Seleciona o novo endereço automaticamente

@@ -25,7 +25,6 @@ export class AddressService {
      * Resposta: { addresses: Address[], total: number }
      */
     getAddresses(): Observable<Address[]> {
-        console.log('Chamando GET /addresses com token');
         return this.http.get<{ addresses: Address[], total: number }>(
             `${this.apiUrl}/addresses`,
             { headers: this.getAuthHeaders() }
