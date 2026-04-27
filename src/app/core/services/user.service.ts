@@ -43,7 +43,7 @@ export class UserService {
    */
   updatePassword(payload: UpdatePasswordPayload): Observable<any> {
     return this.http.post(
-      `${this.base}/update`, 
+      `${this.base}/change-password`, 
       payload,
      { headers: this.getAuthHeaders() }
     );
