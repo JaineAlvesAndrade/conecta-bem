@@ -21,7 +21,7 @@ export interface EventInput {
 export class EventsService {
     private apiUrl = environment.baseApiUrl;
 
-    constructor(private http: HttpClient, private authService: AuthService) {}
+    constructor(private http: HttpClient, private authService: AuthService) { }
 
     private normalizeEvent(rawEvent: any): Event {
         const ownerId = rawEvent?.ownerId ?? rawEvent?.owner?.id;
@@ -56,13 +56,15 @@ export class EventsService {
     private buildEventFormData(event: EventInput, id?: string): FormData {
         const formData = new FormData();
 
-        formData.append(
-            'event',
-            new Blob([JSON.stringify(this.buildEventPayload(event, id))], { type: 'application/json' })
+        const eventBlob = new Blob(
+            [JSON.stringify(this.buildEventPayload(event, id))],
+            { type: 'application/json' }
         );
 
+        formData.append('event', eventBlob, 'event.json');
+
         if (event.image) {
-            formData.append('image', event.image);
+            formData.append('image', event.image, event.image.name);
         }
 
         return formData;
@@ -94,7 +96,7 @@ export class EventsService {
      */
     createEvent(event: EventInput): Observable<Event> {
         return this.http.post<Event>(
-            `${this.apiUrl}/events`, 
+            `${this.apiUrl}/events`,
             this.buildEventFormData(event),
             { headers: this.getAuthHeaders() }
         ).pipe(
@@ -102,10 +104,10 @@ export class EventsService {
         );
     }
 
-        /**
-         * Atualiza um evento existente (requer autenticação)
-         * PATCH /events com id no body
-         */
+    /**
+     * Atualiza um evento existente (requer autenticação)
+     * PATCH /events com id no body
+     */
     updateEvent(id: string, event: EventInput): Observable<Event> {
         return this.http.patch<Event>(
             `${this.apiUrl}/events`,

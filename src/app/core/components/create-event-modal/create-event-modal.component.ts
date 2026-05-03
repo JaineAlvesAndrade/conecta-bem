@@ -251,8 +251,8 @@ export class CreateEventModalComponent implements OnInit {
       description: formValue.description,
       addressId: formValue.addressId,
       category: formValue.category,
-      startsAt: new Date(formValue.startsAt).toISOString().slice(0, -1),
-      endsAt: new Date(formValue.endsAt).toISOString().slice(0, -1),
+      startsAt: new Date(formValue.startsAt).toISOString().slice(0, 19),
+      endsAt: new Date(formValue.endsAt).toISOString().slice(0, 19),
       capacity: parseInt(formValue.capacity, 10),
       image: this.selectedImage()
     };
