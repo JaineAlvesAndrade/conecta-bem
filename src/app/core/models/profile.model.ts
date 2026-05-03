@@ -1,9 +1,9 @@
 export interface UserProfile {
   fullName: string;
-  cpfOrCnpj: string;
+  cpfCnpj: string;
   birthDate: string; // ISO date string, e.g. "1995-06-15"
   email: string;
-  gender: string;
+  gender: Gender;
   phone: string;
   instagram: string;
   linkedin: string;
@@ -22,11 +22,3 @@ export enum Gender {
   OTHER = 'OTHER',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY'
 }
-
-export const GenderLabels = {
-  [Gender.MALE]: 'Masculino',
-  [Gender.FEMALE]: 'Feminino',
-  [Gender.NON_BINARY]: 'Não binário',
-  [Gender.OTHER]: 'Outro',
-  [Gender.PREFER_NOT_TO_SAY]: 'Prefiro não informar'
-};

@@ -15,8 +15,7 @@
       <ng-container *ngIf="isLogin">
         <div class="form-group">
           <label>{{ 'auth.label.email' | translate }}</label>
-          <input type="email" [(ngModel)]="email"
-            (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()"
+          <input type="email" [(ngModel)]="email" (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()"
             name="email" required>
           <div class="error" *ngIf="emailError">{{ emailError | translate }}</div>
         </div>
@@ -43,10 +42,9 @@
             <input type="text" [(ngModel)]="name" name="name" required>
           </div>
           <div class="form-group">
-            <label>CPF / CNPJ <span class="required">*</span></label>
-            <input type="text" [(ngModel)]="cpfCnpj" name="cpfCnpj"
-              (input)="onCpfCnpjInput()" (blur)="validateCpfCnpj()"
-              placeholder="000.000.000-00" maxlength="18" required>
+            <label>CPF / CNPJ</label>
+            <input type="text" [(ngModel)]="cpfCnpj" name="cpfCnpj" (input)="onCpfCnpjInput()"
+              (blur)="validateCpfCnpj()" placeholder="000.000.000-00" maxlength="18" required>
             <div class="error" *ngIf="cpfCnpjError">{{ cpfCnpjError | translate }}</div>
           </div>
         </div>
@@ -59,11 +57,11 @@
           <div class="form-group">
             <label>{{ 'auth.label.gender' | translate }}</label>
             <select [(ngModel)]="gender" name="gender">
-              <option value="">Prefiro não informar</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Feminino">Feminino</option>
-              <option value="Não-binário">Não-binário</option>
-              <option value="Outro">Outro</option>
+              <option [ngValue]="Gender.PREFER_NOT_TO_SAY">Prefiro não informar</option>
+              <option [ngValue]="Gender.MALE">Masculino</option>
+              <option [ngValue]="Gender.FEMALE">Feminino</option>
+              <option [ngValue]="Gender.NON_BINARY">Não binário</option>
+              <option [ngValue]="Gender.OTHER">Outro</option>
             </select>
           </div>
         </div>
@@ -72,16 +70,15 @@
 
         <div class="form-group">
           <label>{{ 'auth.label.email' | translate }} <span class="required">*</span></label>
-          <input type="email" [(ngModel)]="email"
-            (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()"
+          <input type="email" [(ngModel)]="email" (ngModelChange)="emailError = ''" (blur)="validateEmailOnBlur()"
             name="email" required>
           <div class="error" *ngIf="emailError">{{ emailError | translate }}</div>
         </div>
 
         <div class="form-group">
           <label>{{ 'auth.label.phone' | translate }}</label>
-          <input type="tel" [(ngModel)]="phone" name="phone"
-            (input)="onPhoneInput()" placeholder="(00) 00000-0000" maxlength="15">
+          <input type="tel" [(ngModel)]="phone" name="phone" (input)="onPhoneInput()" placeholder="(00) 00000-0000"
+            maxlength="15">
         </div>
 
         <div class="register-section-label">Redes sociais <span class="optional">(opcional)</span></div>
@@ -122,8 +119,10 @@
               <mat-icon>cancel</mat-icon> Senhas diferentes
             </span>
           </label>
-          <div class="password-field" [class.match]="!passwordMismatch && confirmPassword" [class.mismatch]="passwordMismatch">
-            <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+          <div class="password-field" [class.match]="!passwordMismatch && confirmPassword"
+            [class.mismatch]="passwordMismatch">
+            <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword"
+              required>
             <button type="button" class="eye" (click)="toggleShowConfirm()">
               <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
@@ -132,8 +131,7 @@
 
       </ng-container>
 
-      <button type="submit" class="btn-primary"
-        [disabled]="!isLogin && (passwordMismatch || !!cpfCnpjError)">
+      <button type="submit" class="btn-primary" [disabled]="!isLogin && (passwordMismatch || !!cpfCnpjError)">
         {{ isLogin ? ('auth.button.login' | translate) : ('auth.button.register' | translate) }}
       </button>
     </form>

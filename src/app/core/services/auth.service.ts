@@ -46,6 +46,10 @@ export class AuthService {
     return this.http.post<any>(`${this.base}/login`, payload, { observe: 'response' });
   }
 
+  forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/forgot-password`, { email });
+  }
+
   saveToken(token: string, userId?: string | number | null) {
     if (!token) {
       return;

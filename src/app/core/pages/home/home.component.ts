@@ -1,14 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { StatCardComponent } from '../../components/stat-card/stat-card.component';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, CommonModule, StatCardComponent, MatIconModule],
+  imports: [RouterLink, CommonModule, MatIconModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

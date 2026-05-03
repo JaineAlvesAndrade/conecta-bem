@@ -1,13 +1,9 @@
-<!-- profile.component.html (atualizado) -->
-
 <div class="profile-page">
-  <!-- LOAD ERROR -->
   <div class="profile-error" *ngIf="loadError">
     <mat-icon>error_outline</mat-icon>
     <p>Não foi possível carregar o perfil. Tente novamente mais tarde.</p>
   </div>
 
-  <!-- LOADING -->
   <div class="profile-loading" *ngIf="!profile && !loadError">
     <span class="spinner"></span>
     <p>Carregando perfil...</p>
@@ -16,33 +12,24 @@
   <!-- CONTENT -->
   <ng-container *ngIf="profile">
     <div class="profile-container">
-      
+
       <!-- Sidebar com Tabs -->
       <div class="profile-sidebar">
         <div class="profile-name">
           <h2>{{ profile.fullName }}</h2>
-          <span class="profile-doc">{{ profile.cpfOrCnpj }}</span>
+          <span class="profile-doc">{{ profile.cpfCnpj }}</span>
         </div>
-        
+
         <nav class="profile-tabs">
-          <button 
-            class="profile-tab" 
-            [class.active]="activeTab === 'personal'"
-            (click)="activeTab = 'personal'">
+          <button class="profile-tab" [class.active]="activeTab === 'personal'" (click)="activeTab = 'personal'">
             <mat-icon>person_outline</mat-icon>
             <span>Dados pessoais</span>
           </button>
-          <button 
-            class="profile-tab" 
-            [class.active]="activeTab === 'contact'"
-            (click)="activeTab = 'contact'">
+          <button class="profile-tab" [class.active]="activeTab === 'contact'" (click)="activeTab = 'contact'">
             <mat-icon>contact_mail</mat-icon>
             <span>Contatos</span>
           </button>
-          <button 
-            class="profile-tab" 
-            [class.active]="activeTab === 'password'"
-            (click)="activeTab = 'password'">
+          <button class="profile-tab" [class.active]="activeTab === 'password'" (click)="activeTab = 'password'">
             <mat-icon>lock_outline</mat-icon>
             <span>Senha</span>
           </button>
@@ -51,7 +38,7 @@
 
       <!-- Conteúdo Principal -->
       <div class="profile-content">
-        
+
         <!-- Tab: Dados Pessoais -->
         <div class="tab-content" *ngIf="activeTab === 'personal'">
           <div class="profile-card">
@@ -70,12 +57,12 @@
                 <span class="profile-field__value">{{ profile.fullName }}</span>
               </div>
               <div class="profile-field">
-                <span class="profile-field__label">CPF / CNPJ</span>
-                <span class="profile-field__value">{{ profile.cpfOrCnpj }}</span>
-              </div>
-              <div class="profile-field">
                 <span class="profile-field__label">Data de nascimento</span>
                 <span class="profile-field__value">{{ profile.birthDate | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="profile-field">
+                <span class="profile-field__label">CPF / CNPJ</span>
+                <span class="profile-field__value">{{ profile.cpfCnpj }}</span>
               </div>
               <div class="profile-field">
                 <span class="profile-field__label">Gênero</span>
@@ -83,34 +70,36 @@
               </div>
             </div>
 
-            <!-- Modo edição -->
             <form class="profile-form" *ngIf="editingSection === 'personal'" (submit)="saveProfile()">
               <div class="form-group">
                 <label>Nome completo</label>
                 <input type="text" [value]="profile.fullName" disabled class="form-input--disabled">
               </div>
               <div class="form-group">
-                <label>CPF / CNPJ</label>
-                <input type="text" [value]="profile.cpfOrCnpj" disabled class="form-input--disabled">
+                <label>Data de nascimento</label>
+                <input type="text" [value]="profile.birthDate | date:'dd/MM/yyyy'" disabled
+                  class="form-input--disabled">
               </div>
               <div class="form-group">
-                <label>Data de nascimento</label>
-                <input type="text" [value]="profile.birthDate | date:'dd/MM/yyyy'" disabled class="form-input--disabled">
+                <label>CPF/CNPJ</label>
+                <input type="text" [(ngModel)]="draft.cpfCnpj" name="cpfCnpj" (input)="onCpfCnpjInputProfile()"
+                  (blur)="validateCpfCnpjProfile()" placeholder="000.000.000-00" maxlength="18">
+                <div class="error" *ngIf="cpfCnpjError">{{ cpfCnpjError }}</div>
               </div>
               <div class="form-group">
                 <label>Gênero</label>
                 <select [(ngModel)]="draft.gender" name="gender">
-                  <option [value]="Gender.MALE">Masculino</option>
-                  <option [value]="Gender.FEMALE">Feminino</option>
-                  <option [value]="Gender.NON_BINARY">Não binário</option>
-                  <option [value]="Gender.OTHER">Outro</option>
-                  <option [value]="Gender.PREFER_NOT_TO_SAY">Prefiro não informar</option>
+                  <option [value]=Gender.MALE>Masculino</option>
+                  <option [value]=Gender.FEMALE>Feminino</option>
+                  <option [value]=Gender.NON_BINARY>Não binário</option>
+                  <option [value]=Gender.OTHER>Outro</option>
+                  <option [value]=Gender.PREFER_NOT_TO_SAY>Prefiro não informar</option>
                 </select>
               </div>
 
               <div class="profile-form__actions">
                 <button type="button" class="btn-cancel" (click)="cancelEditing()">Cancelar</button>
-                <button type="submit" class="btn-save" [disabled]="saveState === 'loading'">
+                <button type="submit" class="btn-save" [disabled]="saveState === 'loading' || !!cpfCnpjError">
                   {{ saveState === 'loading' ? 'Salvando...' : 'Salvar alterações' }}
                 </button>
               </div>
@@ -184,7 +173,8 @@
               </div>
               <div class="form-group">
                 <label>LinkedIn</label>
-                <input type="url" [(ngModel)]="draft.linkedin" name="linkedin" placeholder="https://linkedin.com/in/...">
+                <input type="url" [(ngModel)]="draft.linkedin" name="linkedin"
+                  placeholder="https://linkedin.com/in/...">
               </div>
 
               <div class="profile-form__actions">
@@ -223,11 +213,8 @@
               <div class="form-group">
                 <label>Senha atual</label>
                 <div class="password-field">
-                  <input [type]="showCurrent ? 'text' : 'password'" 
-                         [(ngModel)]="currentPassword"
-                         name="currentPassword" 
-                         required 
-                         placeholder="Digite sua senha atual">
+                  <input [type]="showCurrent ? 'text' : 'password'" [(ngModel)]="currentPassword" name="currentPassword"
+                    required placeholder="Digite sua senha atual">
                   <button type="button" class="eye-btn" (click)="showCurrent = !showCurrent">
                     <mat-icon>{{ showCurrent ? 'visibility_off' : 'visibility' }}</mat-icon>
                   </button>
@@ -237,11 +224,8 @@
               <div class="form-group">
                 <label>Nova senha</label>
                 <div class="password-field">
-                  <input [type]="showNew ? 'text' : 'password'" 
-                         [(ngModel)]="newPassword"
-                         name="newPassword" 
-                         required 
-                         placeholder="Digite sua nova senha">
+                  <input [type]="showNew ? 'text' : 'password'" [(ngModel)]="newPassword" name="newPassword" required
+                    placeholder="Digite sua nova senha">
                   <button type="button" class="eye-btn" (click)="showNew = !showNew">
                     <mat-icon>{{ showNew ? 'visibility_off' : 'visibility' }}</mat-icon>
                   </button>
@@ -251,11 +235,8 @@
               <div class="form-group">
                 <label>Confirmar nova senha</label>
                 <div class="password-field" [class.match]="passwordMatch" [class.mismatch]="passwordMismatch">
-                  <input [type]="showConfirm ? 'text' : 'password'" 
-                         [(ngModel)]="confirmPassword"
-                         name="confirmPassword" 
-                         required 
-                         placeholder="Confirme sua nova senha">
+                  <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword"
+                    required placeholder="Confirme sua nova senha">
                   <button type="button" class="eye-btn" (click)="showConfirm = !showConfirm">
                     <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
                   </button>
@@ -269,8 +250,8 @@
               </div>
 
               <div class="profile-form__actions">
-                <button type="submit" class="btn-save" 
-                        [disabled]="passwordSaveState === 'loading' || passwordMismatch || !currentPassword || !newPassword || !confirmPassword">
+                <button type="submit" class="btn-save"
+                  [disabled]="passwordSaveState === 'loading' || passwordMismatch || !currentPassword || !newPassword || !confirmPassword">
                   {{ passwordSaveState === 'loading' ? 'Alterando...' : 'Alterar senha' }}
                 </button>
               </div>

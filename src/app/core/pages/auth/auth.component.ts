@@ -6,6 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Gender } from '../../models/profile.model';
 
 @Component({
   selector: 'app-auth',
@@ -26,11 +27,12 @@ export class AuthComponent {
   confirmPassword = '';
   cpfCnpj = '';
   birthDate = '';
-  gender = '';
+  gender = Gender.PREFER_NOT_TO_SAY;
   phone = '';
   instagram = '';
   linkedin = '';
   cpfCnpjError = '';
+  Gender = Gender;
 
 
   constructor(
@@ -49,11 +51,19 @@ export class AuthComponent {
   }
 
   private resetForm() {
-    this.email = ''; this.password = ''; this.confirmPassword = '';
-    this.name = ''; this.cpfCnpj = ''; this.birthDate = '';
-    this.gender = ''; this.phone = ''; this.instagram = ''; this.linkedin = '';
-    this.showPassword = false; this.showConfirm = false;
-    this.errorMessage = ''; this.emailError = ''; this.cpfCnpjError = '';
+    this.email = ''; this.password = ''; 
+    this.confirmPassword = '';
+    this.name = ''; 
+    this.cpfCnpj = ''; 
+    this.birthDate = '';
+    this.gender = Gender.PREFER_NOT_TO_SAY; 
+    this.phone = ''; 
+    this.instagram = ''; 
+    this.linkedin = '';
+    this.showPassword = false; 
+    this.showConfirm = false;
+    this.errorMessage = ''; 
+    this.emailError = ''; this.cpfCnpjError = '';
   }
 
   private isEmailValid(email: string): boolean {
