@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { Event } from '../models/event.model';
 import { AuthService } from './auth.service';
 import { environment } from '../../../environments/environment';
+import { EnrolledParticipant } from '../pages/event-detail/event-detail.component';
 
 export interface EventInput {
     title: string;
@@ -80,7 +81,6 @@ export class EventsService {
     /**
      * Busca eventos públicos (sem autenticação)
      * GET /user/events
-     * Resposta esperada: { events: Event[], total: number }
      */
     getPublicEvents(): Observable<Event[]> {
         return this.http.get<{ events: Event[], total: number }>(
@@ -136,5 +136,59 @@ export class EventsService {
         return this.http.delete(`${this.apiUrl}/events/${id}/image`, {
             headers: this.getAuthHeaders()
         });
+    }
+
+    // ── Novos métodos ────────────────────────────────────────────────────────
+
+    /**
+     * Verifica se o usuário logado está inscrito em um evento.
+     * GET /events/:id/enrollment/status
+     * Resposta esperada: { enrolled: boolean }
+     */
+    isUserEnrolled(eventId: string): Observable<boolean> {
+        return this.http.get<{ enrolled: boolean }>(
+            `${this.apiUrl}/events/${eventId}/enrollment/status`,
+            { headers: this.getAuthHeaders() }
+        ).pipe(
+            map(response => response.enrolled)
+        );
+    }
+
+    /**
+     * Inscreve o usuário logado em um evento.
+     * POST /events/:id/enroll
+     */
+    enrollInEvent(eventId: string): Observable<any> {
+        return this.http.post(
+            `${this.apiUrl}/events/${eventId}/enroll`,
+            {},
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    /**
+     * Retorna a lista de participantes inscritos (acesso restrito ao dono do evento).
+     * GET /events/:id/enrollments
+     * Resposta esperada: EnrolledParticipant[]
+     */
+    getEnrolledParticipants(eventId: string): Observable<EnrolledParticipant[]> {
+        return this.http.get<EnrolledParticipant[]>(
+            `${this.apiUrl}/events/${eventId}/enrollments`,
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    /**
+     * Retorna os eventos em que o usuário logado está inscrito.
+     * GET /user/events/enrolled
+     * Resposta esperada: { events: Event[], total: number }
+     */
+    getMyEnrolledEvents(): Observable<Event[]> {
+        return this.http.get<{ events: Event[], total: number }>(
+            `${this.apiUrl}/user/events/enrolled`,
+            { headers: this.getAuthHeaders() }
+        ).pipe(
+            map(response => (response.events || []).map(event => this.normalizeEvent(event)))
+        );
     }
 }

@@ -1,0 +1,110 @@
+<div class="event-history-page">
+  <div class="section-container">
+
+    <div class="event-history__header">
+      <h1>Meu histórico de eventos</h1>
+      <p>Confira todos os eventos em que você está inscrito ou já participou.</p>
+    </div>
+
+    @if (isLoading()) {
+      <div class="event-history__state">
+        <mat-icon class="spin-icon">hourglass_empty</mat-icon>
+        <p>Carregando histórico...</p>
+      </div>
+    } @else if (error()) {
+      <div class="event-history__state event-history__state--error">
+        <mat-icon>error</mat-icon>
+        <p>{{ error() }}</p>
+        <button class="btn btn--outline btn--sm" (click)="retry()">Tentar novamente</button>
+      </div>
+    } @else if (enrolledEvents().length === 0) {
+      <div class="event-history__state">
+        <mat-icon>event_busy</mat-icon>
+        <p>Você ainda não está inscrito em nenhum evento.</p>
+        <a routerLink="/eventos" class="btn btn--primary btn--sm">Explorar eventos</a>
+      </div>
+    } @else {
+
+      <!-- Upcoming -->
+      @if (upcomingEvents().length > 0) {
+        <section class="event-history__group">
+          <h2 class="event-history__group-title">
+            <mat-icon>upcoming</mat-icon>
+            Próximos eventos
+            <span class="event-history__group-badge">{{ upcomingEvents().length }}</span>
+          </h2>
+
+          <div class="event-history__list">
+            @for (event of upcomingEvents(); track event.id) {
+              <div class="event-history__card" (click)="goToEvent(event)">
+                <div class="event-history__card-img">
+                  <img [src]="getImageSrc(event)" [alt]="event.title" />
+                </div>
+                <div class="event-history__card-body">
+                  <span class="event-history__card-category">{{ categoryLabel(event) }}</span>
+                  <h3>{{ event.title }}</h3>
+                  <p class="event-history__card-desc">{{ event.description }}</p>
+                  <div class="event-history__card-meta">
+                    <span>
+                      <mat-icon>schedule</mat-icon>
+                      {{ formatDate(event.startsAt) }}
+                    </span>
+                    <span>
+                      <mat-icon>group</mat-icon>
+                      {{ event.enrolledCount || 0 }}/{{ event.capacity }}
+                    </span>
+                  </div>
+                </div>
+                <div class="event-history__card-status event-history__card-status--upcoming">
+                  <mat-icon>check_circle</mat-icon>
+                  Inscrito
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- Past -->
+      @if (pastEvents().length > 0) {
+        <section class="event-history__group">
+          <h2 class="event-history__group-title event-history__group-title--past">
+            <mat-icon>history</mat-icon>
+            Eventos passados
+            <span class="event-history__group-badge">{{ pastEvents().length }}</span>
+          </h2>
+
+          <div class="event-history__list">
+            @for (event of pastEvents(); track event.id) {
+              <div class="event-history__card event-history__card--past" (click)="goToEvent(event)">
+                <div class="event-history__card-img">
+                  <img [src]="getImageSrc(event)" [alt]="event.title" />
+                </div>
+                <div class="event-history__card-body">
+                  <span class="event-history__card-category">{{ categoryLabel(event) }}</span>
+                  <h3>{{ event.title }}</h3>
+                  <p class="event-history__card-desc">{{ event.description }}</p>
+                  <div class="event-history__card-meta">
+                    <span>
+                      <mat-icon>schedule</mat-icon>
+                      {{ formatDate(event.startsAt) }}
+                    </span>
+                    <span>
+                      <mat-icon>group</mat-icon>
+                      {{ event.enrolledCount || 0 }}/{{ event.capacity }}
+                    </span>
+                  </div>
+                </div>
+                <div class="event-history__card-status event-history__card-status--past">
+                  <mat-icon>task_alt</mat-icon>
+                  Concluído
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    }
+
+  </div>
+</div>

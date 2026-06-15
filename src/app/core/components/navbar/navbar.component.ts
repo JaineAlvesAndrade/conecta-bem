@@ -52,6 +52,11 @@ export class NavbarComponent {
     this.router.navigate(['/perfil']);
   }
 
+  goToHistory() {
+    this.userMenuOpen = false;
+    this.router.navigate(['/historico-eventos']);
+  }
+
   goToLogin() {
     this.router.navigate(['/login']);
   }

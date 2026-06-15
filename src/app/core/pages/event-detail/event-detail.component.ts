@@ -6,6 +6,16 @@ import { Event, EventCategoryLabels } from '../../models/event.model';
 import { AuthService } from '../../services/auth.service';
 import { EventsService } from '../../services/events.service';
 
+export interface EnrolledParticipant {
+  id: string;
+  name: string;
+  email: string;
+  cpf: string;
+  birthDate: string;
+  phone: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER' | string;
+}
+
 @Component({
   selector: 'app-event-detail',
   standalone: true,
@@ -20,6 +30,14 @@ export class EventDetailComponent implements OnInit {
   isDeletingImage = signal(false);
   showDeleteImageConfirm = signal(false);
 
+  // Enrolled participants (owner-only)
+  enrolledParticipants = signal<EnrolledParticipant[]>([]);
+  isLoadingEnrolled = signal(false);
+
+  // Join state
+  isEnrolled = signal(false);
+  isEnrolling = signal(false);
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -28,32 +46,20 @@ export class EventDetailComponent implements OnInit {
   ) {}
 
   getImageSrc(event: Event | null): string {
-    if (!event) {
-      return '/assets/no_image.png';
-    }
-
+    if (!event) return '/assets/no_image.png';
     const rawImage = event.imageUrl || event.image;
-
-    if (!rawImage) {
-      return '/assets/no_image.png';
-    }
-
-    if (rawImage.startsWith('data:') || rawImage.startsWith('http')) {
-      return rawImage;
-    }
-
+    if (!rawImage) return '/assets/no_image.png';
+    if (rawImage.startsWith('data:') || rawImage.startsWith('http')) return rawImage;
     return `data:image/*;base64,${rawImage}`;
   }
 
   ngOnInit(): void {
     const eventId = this.route.snapshot.paramMap.get('id');
-
     if (!eventId) {
       this.error.set('Evento não encontrado.');
       this.isLoading.set(false);
       return;
     }
-
     this.loadEvent(eventId);
   }
 
@@ -65,11 +71,82 @@ export class EventDetailComponent implements OnInit {
       next: (event) => {
         this.event.set(event);
         this.isLoading.set(false);
+
+        // After loading event, check enrollment status and, if owner, load participants
+        this.checkEnrollmentStatus(event);
+        if (this.canManageEvent()) {
+          this.loadEnrolledParticipants(id);
+        }
       },
       error: (err) => {
         console.error('Erro ao carregar evento:', err);
         this.error.set('Falha ao carregar o evento.');
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  /**
+   * Checks whether the currently logged-in user is already enrolled in this event.
+   * Adapt the call below to whichever endpoint your EventsService exposes.
+   */
+  private checkEnrollmentStatus(event: Event) {
+    if (!this.authService.isLoggedIn() || this.canManageEvent()) return;
+
+    // Example: eventsService.isUserEnrolled(event.id) → Observable<boolean>
+    // Replace with your actual service call.
+    this.eventsService.isUserEnrolled(event.id).subscribe({
+      next: (enrolled) => this.isEnrolled.set(enrolled),
+      error: () => this.isEnrolled.set(false)
+    });
+  }
+
+  /**
+   * Loads the list of participants for the event owner.
+   * Adapt to your actual EventsService method.
+   */
+  private loadEnrolledParticipants(eventId: string) {
+    this.isLoadingEnrolled.set(true);
+
+    // Example: eventsService.getEnrolledParticipants(eventId) → Observable<EnrolledParticipant[]>
+    this.eventsService.getEnrolledParticipants(eventId).subscribe({
+      next: (participants) => {
+        this.enrolledParticipants.set(participants);
+        this.isLoadingEnrolled.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar participantes:', err);
+        this.isLoadingEnrolled.set(false);
+      }
+    });
+  }
+
+  /** Enroll the logged-in user in this event. */
+  joinEvent() {
+    const event = this.event();
+    if (!event || this.isEnrolling() || this.isEnrolled()) return;
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/auth']);
+      return;
+    }
+
+    this.isEnrolling.set(true);
+
+    // Example: eventsService.enrollInEvent(event.id) → Observable<any>
+    this.eventsService.enrollInEvent(event.id).subscribe({
+      next: () => {
+        this.isEnrolled.set(true);
+        this.isEnrolling.set(false);
+        // Update enrolled count optimistically
+        this.event.set({
+          ...event,
+          enrolledCount: (event.enrolledCount ?? 0) + 1
+        });
+      },
+      error: (err) => {
+        console.error('Erro ao participar do evento:', err);
+        this.isEnrolling.set(false);
       }
     });
   }
@@ -90,38 +167,45 @@ export class EventDetailComponent implements OnInit {
     }
   }
 
+  formatDate(dateString: string): string {
+    try {
+      return new Intl.DateTimeFormat('pt-BR').format(new Date(dateString));
+    } catch {
+      return dateString;
+    }
+  }
+
+  genderLabel(gender: string): string {
+    const map: Record<string, string> = {
+      MALE: 'Masculino',
+      FEMALE: 'Feminino',
+      OTHER: 'Outro'
+    };
+    return map[gender] ?? gender;
+  }
+
   canManageEvent(): boolean {
     const event = this.event();
-    if (!event || !this.authService.isLoggedIn()) {
-      return false;
-    }
-
+    if (!event || !this.authService.isLoggedIn()) return false;
     const loggedUserId = this.authService.getUserId();
     return !!loggedUserId && !!event.ownerId && String(event.ownerId) === String(loggedUserId);
   }
 
-  deleteImage() {
-    const event = this.event();
-    if (!event || this.isDeletingImage()) {
-      return;
-    }
+  // ── Image deletion (unchanged) ────────────────────────────────────────────
 
+  deleteImage() {
+    if (!this.event() || this.isDeletingImage()) return;
     this.showDeleteImageConfirm.set(true);
   }
 
   cancelDeleteImage() {
-    if (this.isDeletingImage()) {
-      return;
-    }
-
+    if (this.isDeletingImage()) return;
     this.showDeleteImageConfirm.set(false);
   }
 
   confirmDeleteImage() {
     const event = this.event();
-    if (!event || this.isDeletingImage()) {
-      return;
-    }
+    if (!event || this.isDeletingImage()) return;
 
     this.isDeletingImage.set(true);
     this.showDeleteImageConfirm.set(false);
