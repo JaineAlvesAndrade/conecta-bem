@@ -1,12 +1,8 @@
 <article class="event-card">
   <div class="event-card__image-wrap">
-    <img 
-      [src]="getImageSrc(event)" 
-      [alt]="event.title" 
-      loading="lazy" 
-    />
+    <img [src]="getImageSrc(event)" [alt]="event.title" loading="lazy" />
     @if (isEventUrgent()) {
-      <div class="event-card__urgent">Falta pouco</div>
+    <div class="event-card__urgent">Falta pouco</div>
     }
   </div>
 
@@ -17,7 +13,7 @@
         <span class="event-card__category-badge">{{ getCategoryLabel(event.category) }}</span>
       </div>
     </div>
-    
+
     <p class="event-card__desc">{{ getShortDescription() }}</p>
 
     <div class="event-card__info">
@@ -42,10 +38,27 @@
     </div>
 
     <div class="event-card__actions">
-      <button class="btn btn--primary btn--sm">Participar</button>
+      @if (isEnrolled) {
+      <button class="btn btn--enrolled btn--sm" disabled>
+        <mat-icon>check_circle</mat-icon> Participando
+      </button>
+      } @else if (canEnroll()) {
+      <button class="btn btn--primary btn--sm" (click)="handleEnroll()" [disabled]="enrollLoading">
+        @if (enrollLoading) {
+        <mat-icon class="spin-icon">hourglass_empty</mat-icon>
+        }
+        Participar
+      </button>
+      } @else {
+      <button class="btn btn--primary btn--sm" (click)="handleEnroll()" *ngIf="!authService.isLoggedIn()">
+        Participar
+      </button>
+      }
+
       <button class="btn btn--outline btn--sm" [routerLink]="['/eventos', event.id]">Ver Detalhes</button>
+
       @if (canEdit) {
-        <button class="btn btn--outline btn--sm" (click)="onEditClick()">Editar</button>
+      <button class="btn btn--outline btn--sm" (click)="onEditClick()">Editar</button>
       }
     </div>
   </div>

@@ -14,7 +14,6 @@ import { AuthService } from '../../services/auth.service';
 export class HomeComponent implements OnInit {
   private authService = inject(AuthService);
   
-  // Usando o signal do AuthService diretamente
   get isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }

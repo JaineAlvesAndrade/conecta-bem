@@ -8,6 +8,8 @@ import { EventCardComponent } from '../../components/event-card/event-card.compo
 import { CreateEventModalComponent } from '../../components/create-event-modal/create-event-modal.component';
 import { Event, EventCategory } from '../../models/event.model';
 import { MatIcon } from "@angular/material/icon";
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-events',
@@ -18,6 +20,7 @@ import { MatIcon } from "@angular/material/icon";
 })
 export class EventsComponent implements OnInit {
   private allEvents = signal<Event[]>([]);
+  private enrollmentMap = signal<Map<string, boolean>>(new Map());
 
   searchQuery = signal('');
   selectedCategory = signal('todos');
@@ -42,15 +45,15 @@ export class EventsComponent implements OnInit {
 
   filteredEvents = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
-    const selectedCat   = this.selectedCategory();
+    const selectedCat = this.selectedCategory();
     const mappedCat = this.categoryMap[selectedCat] as EventCategory | 'todos';
 
     return this.allEvents().filter(e => {
-      const matchCat    = mappedCat === 'todos' || e.category === mappedCat;
+      const matchCat = mappedCat === 'todos' || e.category === mappedCat;
       const matchSearch = !query ||
         e.title.toLowerCase().includes(query) ||
         e.description.toLowerCase().includes(query);
-        return matchCat && matchSearch;
+      return matchCat && matchSearch;
     });
   });
 
@@ -64,15 +67,75 @@ export class EventsComponent implements OnInit {
     this.loadPublicEvents();
   }
 
+  private loadPublicEvents() {
+    this.isLoading.set(true);
+    this.error.set(null);
+    
+    this.eventsService.getPublicEvents().subscribe({
+      next: (events) => {
+        this.allEvents.set(events);
+        this.isLoading.set(false);
+        this.loadEnrollmentStatuses(events);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar eventos:', err);
+        this.error.set('Falha ao carregar eventos');
+        this.isLoading.set(false);
+        this.allEvents.set([]);
+      }
+    });
+  }
+private loadEnrollmentStatuses(events: Event[]) {
+    if (!this.authService.isLoggedIn()) return;
+
+    const loggedUserId = this.authService.getUserId();
+    const filteredEvents = events.filter(e => String(e.ownerId) !== String(loggedUserId));
+    if (filteredEvents.length === 0) return;
+
+    const requests = filteredEvents.map(event =>
+        this.eventsService.isUserEnrolled(event.id).pipe(
+            map((enrolled: boolean) => ({ id: event.id, enrolled }))
+        )
+    );
+
+    forkJoin(requests).subscribe((results: { id: string; enrolled: boolean }[]) => {
+        const newMap = new Map<string, boolean>();
+        results.forEach(({ id, enrolled }) => newMap.set(id, enrolled));
+        this.enrollmentMap.set(newMap);
+    });
+}
+
+  isEnrolled(eventId: string): boolean {
+    return this.enrollmentMap().get(eventId) || false;
+  }
+
+  onEnrollmentChange(event: { eventId: string; enrolled: boolean; newCount?: number }) {
+    const updatedMap = new Map(this.enrollmentMap());
+    updatedMap.set(event.eventId, event.enrolled);
+    this.enrollmentMap.set(updatedMap);
+
+    if (event.newCount !== undefined) {
+      this.allEvents.update(events =>
+        events.map(e =>
+          e.id === event.eventId
+            ? { ...e, enrolledCount: event.newCount! }
+            : e
+        )
+      );
+    } else {
+      this.eventsService.getPublicEventById(event.eventId).subscribe(updatedEvent => {
+        this.allEvents.update(events =>
+          events.map(e => e.id === event.eventId ? { ...e, enrolledCount: updatedEvent.enrolledCount } : e)
+        );
+      });
+    }
+  }
+
   openCreateEventModal() {
-    // Verifica se usuário está logado
     if (!this.authService.isLoggedIn()) {
-      // Se não estiver logado, redireciona para login
       this.router.navigate(['/auth']);
       return;
     }
-
-    // Abre o modal
     this.showCreateModal.set(true);
   }
 
@@ -82,10 +145,16 @@ export class EventsComponent implements OnInit {
   }
 
   onEventCreated(newEvent: Event) {
-    // Adiciona o novo evento à lista e fecha o modal
     this.allEvents.update(events => [newEvent, ...events]);
     this.showCreateModal.set(false);
     this.selectedEventToEdit.set(null);
+    if (this.authService.isLoggedIn() && String(newEvent.ownerId) !== String(this.authService.getUserId())) {
+      this.eventsService.isUserEnrolled(newEvent.id).subscribe(enrolled => {
+        const newMap = new Map(this.enrollmentMap());
+        newMap.set(newEvent.id, enrolled);
+        this.enrollmentMap.set(newMap);
+      });
+    }
   }
 
   onEventUpdated(updatedEvent: Event) {
@@ -94,46 +163,25 @@ export class EventsComponent implements OnInit {
     );
     this.showCreateModal.set(false);
     this.selectedEventToEdit.set(null);
+    if (this.authService.isLoggedIn()) {
+      this.eventsService.isUserEnrolled(updatedEvent.id).subscribe(enrolled => {
+        const newMap = new Map(this.enrollmentMap());
+        newMap.set(updatedEvent.id, enrolled);
+        this.enrollmentMap.set(newMap);
+      });
+    }
   }
 
   openEditEventModal(event: Event) {
-    if (!this.canEditEvent(event)) {
-      return;
-    }
-
+    if (!this.canEditEvent(event)) return;
     this.selectedEventToEdit.set(event);
     this.showCreateModal.set(true);
   }
 
   canEditEvent(event: Event): boolean {
-    if (!this.authService.isLoggedIn()) {
-      return false;
-    }
-
+    if (!this.authService.isLoggedIn()) return false;
     const loggedUserId = this.authService.getUserId();
-    if (!loggedUserId || !event.ownerId) {
-      return false;
-    }
-
-    return String(event.ownerId) === String(loggedUserId);
-  }
-
-  private loadPublicEvents() {
-    this.isLoading.set(true);
-    this.error.set(null);
-    
-    this.eventsService.getPublicEvents().subscribe({
-      next: (events) => {
-        this.allEvents.set(events);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Erro ao carregar eventos:', err);
-        this.error.set('Falha ao carregar eventos');
-        this.isLoading.set(false);
-        this.allEvents.set([]);
-      }
-    });
+    return !!loggedUserId && String(event.ownerId) === String(loggedUserId);
   }
 
   setCategory(cat: string) {

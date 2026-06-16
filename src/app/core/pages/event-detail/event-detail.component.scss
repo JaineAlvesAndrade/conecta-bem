@@ -50,8 +50,6 @@
   &__breadcrumb-separator { color: #b0b0b0; }
   &__breadcrumb-current   { color: var(--color-text-muted); }
 
-  // ── Hero ──────────────────────────────────────────────────────────────────
-
   &__hero {
     position: relative;
     height: 420px;
@@ -106,8 +104,6 @@
     letter-spacing: 0.02em;
     text-transform: uppercase;
   }
-
-  // ── Content grid ──────────────────────────────────────────────────────────
 
   &__content {
     display: grid;
@@ -170,36 +166,40 @@
     }
   }
 
-  // ── Actions ───────────────────────────────────────────────────────────────
+&__actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
 
-  &__actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
-    gap: 1rem;
+  .event-detail__join-btn--full {
+    width: 100%;
   }
 
-  &__back-btn,
-  &__join-btn {
-    min-width: 170px;
+  .event-detail__button-group {
+    display: flex;
+    gap: 1rem;
+    flex: 0 0 auto;
   }
 
   @media (max-width: 640px) {
-    &__actions {
+    flex-direction: column;
+
+    .event-detail__button-group {
       flex-direction: column;
+      width: 100%;
+
+      button {
+        width: 100%;
+      }
     }
 
-    &__back-btn,
-    &__join-btn {
+    .event-detail__join-btn--full {
       width: 100%;
-      min-width: 0;
     }
   }
-
-  // ── Enrolled section (owner only) ─────────────────────────────────────────
+}
 
   &__enrolled {
-    // Overrides the generic section border to give a subtle tinted background
     background: #f9f9f9;
 
     &-header {
@@ -300,8 +300,6 @@
   }
 }
 
-// ── "Participando" button variant ─────────────────────────────────────────────
-
 .btn--enrolled {
   display: inline-flex;
   align-items: center;
@@ -319,8 +317,6 @@
     height: 18px;
   }
 }
-
-// ── Spinning icon utility ──────────────────────────────────────────────────────
 
 .spin-icon {
   animation: spin 1s linear infinite;

@@ -29,12 +29,8 @@ export class EventDetailComponent implements OnInit {
   error = signal<string | null>(null);
   isDeletingImage = signal(false);
   showDeleteImageConfirm = signal(false);
-
-  // Enrolled participants (owner-only)
   enrolledParticipants = signal<EnrolledParticipant[]>([]);
   isLoadingEnrolled = signal(false);
-
-  // Join state
   isEnrolled = signal(false);
   isEnrolling = signal(false);
 
@@ -72,7 +68,6 @@ export class EventDetailComponent implements OnInit {
         this.event.set(event);
         this.isLoading.set(false);
 
-        // After loading event, check enrollment status and, if owner, load participants
         this.checkEnrollmentStatus(event);
         if (this.canManageEvent()) {
           this.loadEnrolledParticipants(id);
@@ -86,29 +81,18 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
-  /**
-   * Checks whether the currently logged-in user is already enrolled in this event.
-   * Adapt the call below to whichever endpoint your EventsService exposes.
-   */
   private checkEnrollmentStatus(event: Event) {
     if (!this.authService.isLoggedIn() || this.canManageEvent()) return;
 
-    // Example: eventsService.isUserEnrolled(event.id) → Observable<boolean>
-    // Replace with your actual service call.
     this.eventsService.isUserEnrolled(event.id).subscribe({
       next: (enrolled) => this.isEnrolled.set(enrolled),
       error: () => this.isEnrolled.set(false)
     });
   }
 
-  /**
-   * Loads the list of participants for the event owner.
-   * Adapt to your actual EventsService method.
-   */
   private loadEnrolledParticipants(eventId: string) {
     this.isLoadingEnrolled.set(true);
 
-    // Example: eventsService.getEnrolledParticipants(eventId) → Observable<EnrolledParticipant[]>
     this.eventsService.getEnrolledParticipants(eventId).subscribe({
       next: (participants) => {
         this.enrolledParticipants.set(participants);
@@ -121,7 +105,6 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
-  /** Enroll the logged-in user in this event. */
   joinEvent() {
     const event = this.event();
     if (!event || this.isEnrolling() || this.isEnrolled()) return;
@@ -133,12 +116,10 @@ export class EventDetailComponent implements OnInit {
 
     this.isEnrolling.set(true);
 
-    // Example: eventsService.enrollInEvent(event.id) → Observable<any>
     this.eventsService.enrollInEvent(event.id).subscribe({
       next: () => {
         this.isEnrolled.set(true);
         this.isEnrolling.set(false);
-        // Update enrolled count optimistically
         this.event.set({
           ...event,
           enrolledCount: (event.enrolledCount ?? 0) + 1
@@ -191,8 +172,6 @@ export class EventDetailComponent implements OnInit {
     return !!loggedUserId && !!event.ownerId && String(event.ownerId) === String(loggedUserId);
   }
 
-  // ── Image deletion (unchanged) ────────────────────────────────────────────
-
   deleteImage() {
     if (!this.event() || this.isDeletingImage()) return;
     this.showDeleteImageConfirm.set(true);
@@ -236,4 +215,25 @@ export class EventDetailComponent implements OnInit {
   goBack() {
     this.router.navigate(['/eventos']);
   }
+
+cancelEnrollment() {
+  const event = this.event();
+  if (!event || !this.isEnrolled() || this.canManageEvent()) return;
+
+  this.isEnrolling.set(true);
+  this.eventsService.cancelEnrollment(event.id).subscribe({
+    next: () => {
+      this.isEnrolled.set(false);
+      this.isEnrolling.set(false);
+      this.event.set({
+        ...event,
+        enrolledCount: Math.max((event.enrolledCount ?? 0) - 1, 0)
+      });
+    },
+    error: (err) => {
+      console.error('Erro ao cancelar inscrição:', err);
+      this.isEnrolling.set(false);
+    }
+  });
+}
 }

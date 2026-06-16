@@ -159,10 +159,7 @@ export class CreateEventModalComponent implements OnInit {
       next: (newAddress) => {
         this.addresses.update(addrs => [...addrs, newAddress]);
         
-        // Seleciona o novo endereço automaticamente
-        this.eventForm.patchValue({ addressId: newAddress.id });
-        
-        // Fecha o formulário de criar endereço
+        this.eventForm.patchValue({ addressId: newAddress.id });        
         this.showCreateAddressForm.set(false);
         this.addressForm.reset({ country: 'Brasil' });
         

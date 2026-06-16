@@ -1,150 +1,135 @@
 <section class="event-detail">
   <div class="section-container">
     @if (isLoading()) {
-      <div class="event-detail__state">Carregando evento...</div>
+    <div class="event-detail__state">Carregando evento...</div>
     } @else if (error()) {
-      <div class="event-detail__state event-detail__state--error">
-        <mat-icon>error</mat-icon>
-        <p>{{ error() }}</p>
-        <div class="event-detail__actions">
-          <button class="btn btn--outline" (click)="goBack()">Voltar para eventos</button>
+    <div class="event-detail__state event-detail__state--error">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+      <div class="event-detail__actions">
+        <button class="btn btn--outline" (click)="goBack()">Voltar para eventos</button>
+      </div>
+    </div>
+    } @else if (event()) {
+    <nav class="event-detail__breadcrumb" aria-label="Breadcrumb">
+      <a href="/eventos" class="event-detail__breadcrumb-link">Eventos</a>
+      <span class="event-detail__breadcrumb-separator">/</span>
+      <span class="event-detail__breadcrumb-current">{{ event()!.title }}</span>
+    </nav>
+
+    <article class="event-detail__card">
+      <div class="event-detail__hero">
+        <img [src]="getImageSrc(event())" [alt]="event()!.title" />
+        <div class="event-detail__hero-overlay">
+          <span class="event-detail__category">{{ categoryLabel }}</span>
+          <h1>{{ event()!.title }}</h1>
+          <p>{{ event()!.description }}</p>
         </div>
       </div>
-    } @else if (event()) {
-      <nav class="event-detail__breadcrumb" aria-label="Breadcrumb">
-        <a href="/eventos" class="event-detail__breadcrumb-link">Eventos</a>
-        <span class="event-detail__breadcrumb-separator">/</span>
-        <span class="event-detail__breadcrumb-current">{{ event()!.title }}</span>
-      </nav>
 
-      <article class="event-detail__card">
-        <div class="event-detail__hero">
-          <img [src]="getImageSrc(event())" [alt]="event()!.title" />
-          <div class="event-detail__hero-overlay">
-            <span class="event-detail__category">{{ categoryLabel }}</span>
-            <h1>{{ event()!.title }}</h1>
+      <div class="event-detail__content">
+        <div class="event-detail__main">
+          <div class="event-detail__section">
+            <h2>Sobre o evento</h2>
             <p>{{ event()!.description }}</p>
           </div>
-        </div>
 
-        <div class="event-detail__content">
-          <div class="event-detail__main">
-            <div class="event-detail__section">
-              <h2>Sobre o evento</h2>
-              <p>{{ event()!.description }}</p>
-            </div>
-
-            <div class="event-detail__section" *ngIf="event()!.address">
-              <h2>Localização</h2>
-              <p>
-                {{ event()!.address.street }}, {{ event()!.address.number }}<br />
-                {{ event()!.address.neighborhood }} - {{ event()!.address.city }}/{{ event()!.address.state }}<br />
-                CEP {{ event()!.address.postalCode }}
-              </p>
-            </div>
-
-            <!-- Enrolled participants — only visible to event owner -->
-            @if (canManageEvent()) {
-              <div class="event-detail__section event-detail__enrolled">
-                <div class="event-detail__enrolled-header">
-                  <h2>
-                    <mat-icon>group</mat-icon>
-                    Participantes inscritos
-                  </h2>
-                  <span class="event-detail__enrolled-badge">
-                    {{ enrolledParticipants().length }} / {{ event()!.capacity }}
-                  </span>
-                </div>
-
-                @if (isLoadingEnrolled()) {
-                  <div class="event-detail__enrolled-loading">
-                    <mat-icon class="spin-icon">hourglass_empty</mat-icon>
-                    <span>Carregando participantes...</span>
-                  </div>
-                } @else if (enrolledParticipants().length === 0) {
-                  <div class="event-detail__enrolled-empty">
-                    <mat-icon>person_off</mat-icon>
-                    <span>Nenhum participante inscrito ainda.</span>
-                  </div>
-                } @else {
-                  <div class="event-detail__enrolled-table-wrapper">
-                    <table class="event-detail__enrolled-table">
-                      <thead>
-                        <tr>
-                          <th>Nome</th>
-                          <th>E-mail</th>
-                          <th>CPF</th>
-                          <th>Nascimento</th>
-                          <th>Telefone</th>
-                          <th>Gênero</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for (p of enrolledParticipants(); track p.id) {
-                          <tr>
-                            <td>{{ p.name }}</td>
-                            <td>{{ p.email }}</td>
-                            <td>{{ p.cpf }}</td>
-                            <td>{{ formatDate(p.birthDate) }}</td>
-                            <td>{{ p.phone }}</td>
-                            <td>{{ genderLabel(p.gender) }}</td>
-                          </tr>
-                        }
-                      </tbody>
-                    </table>
-                  </div>
-                }
-              </div>
-            }
+          <div class="event-detail__section" *ngIf="event()!.address">
+            <h2>Localização</h2>
+            <p>
+              {{ event()!.address.street }}, {{ event()!.address.number }}<br />
+              {{ event()!.address.neighborhood }} - {{ event()!.address.city }}/{{ event()!.address.state }}<br />
+              CEP {{ event()!.address.postalCode }}
+            </p>
           </div>
 
-          <aside class="event-detail__sidebar">
-            <div class="event-detail__info-card">
-              <h3>Detalhes</h3>
-              <ul>
-                <li><strong>Início:</strong> {{ formatDateTime(event()!.startsAt) }}</li>
-                <li><strong>Término:</strong> {{ formatDateTime(event()!.endsAt) }}</li>
-                <li><strong>Vagas:</strong> {{ event()!.enrolledCount || 0 }}/{{ event()!.capacity }}</li>
-                <li><strong>Categoria:</strong> {{ categoryLabel }}</li>
-              </ul>
+          @if (canManageEvent()) {
+          <div class="event-detail__section event-detail__enrolled">
+            <div class="event-detail__enrolled-header">
+              <h2>
+                <mat-icon>group</mat-icon>
+                Participantes inscritos
+              </h2>
+              <span class="event-detail__enrolled-badge">
+                {{ enrolledParticipants().length }} / {{ event()!.capacity }}
+              </span>
             </div>
 
-            <div class="event-detail__actions">
-              <button class="btn btn--outline btn--lg event-detail__back-btn" type="button" (click)="goBack()">
-                Voltar
-              </button>
-
-              <!-- Owner: no join button -->
-              @if (!canManageEvent()) {
-                @if (isEnrolled()) {
-                  <!-- Already enrolled -->
-                  <button
-                    class="btn btn--enrolled btn--lg event-detail__join-btn"
-                    type="button"
-                    disabled
-                  >
-                    <mat-icon>check_circle</mat-icon>
-                    Participando
-                  </button>
-                } @else {
-                  <!-- Can join -->
-                  <button
-                    class="btn btn--primary btn--lg event-detail__join-btn"
-                    type="button"
-                    [disabled]="isEnrolling()"
-                    (click)="joinEvent()"
-                  >
-                    @if (isEnrolling()) {
-                      <mat-icon class="spin-icon">hourglass_empty</mat-icon>
-                    }
-                    Participar
-                  </button>
-                }
-              }
+            @if (isLoadingEnrolled()) {
+            <div class="event-detail__enrolled-loading">
+              <mat-icon class="spin-icon">hourglass_empty</mat-icon>
+              <span>Carregando participantes...</span>
             </div>
-          </aside>
+            } @else if (enrolledParticipants().length === 0) {
+            <div class="event-detail__enrolled-empty">
+              <mat-icon>person_off</mat-icon>
+              <span>Nenhum participante inscrito ainda.</span>
+            </div>
+            } @else {
+            <div class="event-detail__enrolled-table-wrapper">
+              <table class="event-detail__enrolled-table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>CPF</th>
+                    <th>Nascimento</th>
+                    <th>Telefone</th>
+                    <th>Gênero</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of enrolledParticipants(); track p.id) {
+                  <tr>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.email }}</td>
+                    <td>{{ p.cpf }}</td>
+                    <td>{{ formatDate(p.birthDate) }}</td>
+                    <td>{{ p.phone }}</td>
+                    <td>{{ genderLabel(p.gender) }}</td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            }
+          </div>
+          }
         </div>
-      </article>
+
+        <aside class="event-detail__sidebar">
+          <div class="event-detail__info-card">
+            <h3>Detalhes</h3>
+            <ul>
+              <li><strong>Início:</strong> {{ formatDateTime(event()!.startsAt) }}</li>
+              <li><strong>Término:</strong> {{ formatDateTime(event()!.endsAt) }}</li>
+              <li><strong>Vagas:</strong> {{ event()!.enrolledCount || 0 }}/{{ event()!.capacity }}</li>
+              <li><strong>Categoria:</strong> {{ categoryLabel }}</li>
+            </ul>
+          </div>
+
+          <div class="event-detail__actions">
+  @if (!canManageEvent()) {
+    @if (isEnrolled()) {
+      <!-- Dois botões: Participando (desabilitado) + Cancelar inscrição -->
+      <div class="event-detail__button-group">
+        <button class="btn btn--enrolled btn--lg" disabled>
+          <mat-icon>check_circle</mat-icon> Participando
+        </button>
+        <button class="btn btn--outline btn--lg" (click)="cancelEnrollment()">
+          Cancelar inscrição
+        </button>
+      </div>
+    } @else {
+      <button class="btn btn--primary btn--lg event-detail__join-btn--full" (click)="joinEvent()">
+        Participar
+      </button>
+    }
+  }
+</div>
+        </aside>
+      </div>
+    </article>
     }
   </div>
 </section>

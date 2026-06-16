@@ -28,8 +28,6 @@
     }
   }
 
-  // ── State screens ───────────────────────────────────────────────────────────
-
   &__state {
     display: flex;
     flex-direction: column;
@@ -53,8 +51,6 @@
       mat-icon { color: #d32f2f; }
     }
   }
-
-  // ── Group (upcoming / past) ─────────────────────────────────────────────────
 
   &__group {
     margin-bottom: 2.5rem;
@@ -93,8 +89,6 @@
     letter-spacing: 0.02em;
     margin-left: 0.25rem;
   }
-
-  // ── Card list ───────────────────────────────────────────────────────────────
 
   &__list {
     display: flex;
@@ -188,8 +182,6 @@
     font-size: 0.82rem;
     color: var(--color-text-muted);
     line-height: 1.5;
-
-    // 2-line clamp
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -244,8 +236,6 @@
     }
   }
 }
-
-// ── Spin utility ────────────────────────────────────────────────────────────────
 
 .spin-icon {
   animation: spin 1s linear infinite;

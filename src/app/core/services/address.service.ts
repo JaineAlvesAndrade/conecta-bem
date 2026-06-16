@@ -19,11 +19,6 @@ export class AddressService {
         };
     }
 
-    /**
-     * Busca todos os endereços disponíveis do usuário logado
-     * GET /addresses (requer autenticação)
-     * Resposta: { addresses: Address[], total: number }
-     */
     getAddresses(): Observable<Address[]> {
         return this.http.get<{ addresses: Address[], total: number }>(
             `${this.apiUrl}/addresses`,
@@ -33,10 +28,6 @@ export class AddressService {
         );
     }
 
-    /**
-     * Busca um endereço específico por ID do usuário logado
-     * GET /addresses/:id (requer autenticação)
-     */
     getAddressById(id: string): Observable<Address> {
         return this.http.get<Address>(
             `${this.apiUrl}/addresses/${id}`,
@@ -44,10 +35,6 @@ export class AddressService {
         );
     }
 
-    /**
-     * Cria um novo endereço (requer autenticação)
-     * POST /addresses
-     */
     createAddress(payload: CreateAddressPayload): Observable<Address> {
         return this.http.post<Address>(
             `${this.apiUrl}/addresses`,
