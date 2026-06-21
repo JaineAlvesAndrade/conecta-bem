@@ -18,7 +18,6 @@ export class UserService {
     };
   }
 
-  /** GET /user/profile */
   getProfile(): Observable<UserProfile> {
     return this.http.get<UserProfile>(
       `${this.base}/profile`,
@@ -26,10 +25,6 @@ export class UserService {
     );
   }
 
-  /**
-   * POST /user/update
-   * Sends only the editable fields (partial update).
-   */
   updateProfile(payload: Partial<UserProfile>): Observable<any> {
     return this.http.post(
       `${this.base}/update`, 
@@ -38,9 +33,6 @@ export class UserService {
     );
   }
 
-  /**
-   * POST /user/update
-   */
   updatePassword(payload: UpdatePasswordPayload): Observable<any> {
     return this.http.post(
       `${this.base}/change-password`, 

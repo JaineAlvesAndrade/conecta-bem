@@ -211,8 +211,6 @@ export class EventDetailComponent implements OnInit {
     return !!loggedUserId && !!event.ownerId && String(event.ownerId) === String(loggedUserId);
   }
 
-  // ── Image deletion (unchanged) ────────────────────────────────────────────
-
   deleteImage() {
     if (!this.event() || this.isDeletingImage()) return;
     this.showDeleteImageConfirm.set(true);

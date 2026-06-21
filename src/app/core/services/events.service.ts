@@ -78,10 +78,6 @@ export class EventsService {
         };
     }
 
-    /**
-     * Busca eventos públicos (sem autenticação)
-     * GET /user/events
-     */
     getPublicEvents(): Observable<Event[]> {
         return this.http.get<{ events: Event[], total: number }>(
             `${this.apiUrl}/user/events`
@@ -90,10 +86,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Cria um novo evento (requer autenticação)
-     * POST /events
-     */
     createEvent(event: EventInput): Observable<Event> {
         return this.http.post<Event>(
             `${this.apiUrl}/events`,
@@ -104,10 +96,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Atualiza um evento existente (requer autenticação)
-     * PATCH /events com id no body
-     */
     updateEvent(id: string, event: EventInput): Observable<Event> {
         return this.http.patch<Event>(
             `${this.apiUrl}/events`,
@@ -118,10 +106,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Busca evento por ID (sem autenticação)
-     * GET /user/events/:id
-     */
     getPublicEventById(id: string): Observable<Event> {
         return this.http.get<Event>(`${this.apiUrl}/user/events/${id}`).pipe(
             map(event => this.normalizeEvent(event))
@@ -138,13 +122,6 @@ export class EventsService {
         });
     }
 
-    // ── Novos métodos ────────────────────────────────────────────────────────
-
-    /**
-     * Verifica se o usuário logado está inscrito em um evento.
-     * GET /events/:id/enrollment/status
-     * Resposta esperada: { enrolled: boolean }
-     */
     isUserEnrolled(eventId: string): Observable<boolean> {
         return this.http.get<{ enrolled: boolean }>(
             `${this.apiUrl}/events/${eventId}/enrollment/status`,
@@ -154,10 +131,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Inscreve o usuário logado em um evento.
-     * POST /events/:id/enroll
-     */
     enrollInEvent(eventId: string): Observable<any> {
         return this.http.post(
             `${this.apiUrl}/events/${eventId}/enroll`,
@@ -166,11 +139,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Retorna a lista de participantes inscritos (acesso restrito ao dono do evento).
-     * GET /events/:id/enrollments
-     * Resposta esperada: EnrolledParticipant[]
-     */
     getEnrolledParticipants(eventId: string): Observable<EnrolledParticipant[]> {
         return this.http.get<EnrolledParticipant[]>(
             `${this.apiUrl}/events/${eventId}/enrollments`,
@@ -178,11 +146,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Retorna os eventos em que o usuário logado está inscrito.
-     * GET /user/events/enrolled
-     * Resposta esperada: EventResponse[] (array direto)
-     */
     getMyEnrolledEvents(): Observable<Event[]> {
         return this.http.get<any[]>(
             `${this.apiUrl}/user/events/enrolled`,
