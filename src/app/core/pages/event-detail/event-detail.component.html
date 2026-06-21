@@ -123,12 +123,7 @@
                     [disabled]="isProcessingEnrollment()"
                     (click)="onParticipateClick()"
                   >
-                    @if (isProcessingEnrollment()) {
-                      <mat-icon class="spin-icon">hourglass_empty</mat-icon>
-                    } @else {
-                      <mat-icon>check_circle</mat-icon>
-                    }
-                    Cancelar inscrição
+                    {{ isProcessingEnrollment() ? 'Cancelando...' : 'Cancelar inscrição' }}
                   </button>
                 } @else {
                   <button
@@ -137,10 +132,7 @@
                     [disabled]="isProcessingEnrollment()"
                     (click)="onParticipateClick()"
                   >
-                    @if (isProcessingEnrollment()) {
-                      <mat-icon class="spin-icon">hourglass_empty</mat-icon>
-                    }
-                    Participar
+                    {{ isProcessingEnrollment() ? 'Participando...' : 'Participar' }}
                   </button>
                 }
               }

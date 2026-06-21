@@ -50,8 +50,6 @@
   &__breadcrumb-separator { color: #b0b0b0; }
   &__breadcrumb-current   { color: var(--color-text-muted); }
 
-  // ── Hero ──────────────────────────────────────────────────────────────────
-
   &__hero {
     position: relative;
     height: 420px;
@@ -106,8 +104,6 @@
     letter-spacing: 0.02em;
     text-transform: uppercase;
   }
-
-  // ── Content grid ──────────────────────────────────────────────────────────
 
   &__content {
     display: grid;
@@ -170,8 +166,6 @@
     }
   }
 
-  // ── Actions ───────────────────────────────────────────────────────────────
-
   &__actions {
     display: flex;
     justify-content: space-between;
@@ -195,8 +189,6 @@
       min-width: 0;
     }
   }
-
-  // ── Enrolled section (owner only) ─────────────────────────────────────────
 
   &__enrolled {
     background: #f9f9f9;
@@ -299,26 +291,11 @@
   }
 }
 
-// ── Button variants used by the participate/cancel action ──────────────────────
-
 .btn--enrolled,
 .btn--cancel-enrollment {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
   background: #fdecea;
   color: #c62828;
-  border: 1.5px solid #f3b9b3;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: background 0.15s, border-color 0.15s;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
+  border-color: #f3b9b3;
 
   &:hover:not(:disabled) {
     background: #fbdedb;

@@ -88,4 +88,8 @@ export class EventHistoryComponent implements OnInit {
   retry() {
     this.loadHistory();
   }
+
+  goToEvents() {
+    this.router.navigate(['/eventos']);
+  }
 }

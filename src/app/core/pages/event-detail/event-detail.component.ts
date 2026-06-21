@@ -30,12 +30,8 @@ export class EventDetailComponent implements OnInit {
   error = signal<string | null>(null);
   isDeletingImage = signal(false);
   showDeleteImageConfirm = signal(false);
-
-  // Enrolled participants (owner-only)
   enrolledParticipants = signal<EnrolledParticipant[]>([]);
   isLoadingEnrolled = signal(false);
-
-  // Join / cancel state
   isEnrolled = signal(false);
   isProcessingEnrollment = signal(false);
   showLoginModal = signal(false);

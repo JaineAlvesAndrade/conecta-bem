@@ -21,7 +21,7 @@
       <div class="event-history__state">
         <mat-icon>event_busy</mat-icon>
         <p>Você ainda não está inscrito em nenhum evento.</p>
-        <a routerLink="/eventos" class="btn btn--primary btn--sm">Explorar eventos</a>
+        <a routerLink="/eventos" class="btn btn--primary btn--sm" (click)="goToEvents()">Explorar eventos</a>
       </div>
     } @else {
 

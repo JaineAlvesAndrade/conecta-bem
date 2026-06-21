@@ -14,7 +14,7 @@ export class LoginRequiredModalComponent {
   @Output() close = new EventEmitter<void>();
 
   constructor(private router: Router) {}
-
+  
   onClose() {
     this.close.emit();
   }
@@ -26,6 +26,7 @@ export class LoginRequiredModalComponent {
   }
 
   goToLogin() {
-    this.router.navigate(['/auth']);
+    this.onClose();
+    this.router.navigate(['/login']);
   }
 }
