@@ -11,8 +11,9 @@ export interface UserProfile {
 
 export interface UpdatePasswordPayload {
   email: string;
-  currentPassword: string;
+  currentPassword?: string;
   newPassword: string;
+  temporaryPassword?: string;
 }
 
 export enum Gender {
