@@ -29,7 +29,6 @@ export class AuthService {
   private readonly storageUserIdKey = 'userId';
   private readonly tokenLifetimeMs = 12 * 60 * 60 * 1000; // 12 hours
 
-  // Signal para rastrear estado de autenticação
   isLoggedIn = signal<boolean>(this.isUserLoggedIn());
 
   constructor(private http: HttpClient) {}

@@ -65,14 +65,10 @@ export class EventsComponent implements OnInit {
   }
 
   openCreateEventModal() {
-    // Verifica se usuário está logado
     if (!this.authService.isLoggedIn()) {
-      // Se não estiver logado, redireciona para login
       this.router.navigate(['/auth']);
       return;
     }
-
-    // Abre o modal
     this.showCreateModal.set(true);
   }
 
@@ -82,7 +78,6 @@ export class EventsComponent implements OnInit {
   }
 
   onEventCreated(newEvent: Event) {
-    // Adiciona o novo evento à lista e fecha o modal
     this.allEvents.update(events => [newEvent, ...events]);
     this.showCreateModal.set(false);
     this.selectedEventToEdit.set(null);

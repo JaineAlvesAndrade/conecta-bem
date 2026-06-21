@@ -127,6 +127,11 @@
     gap: 0.75rem;
     margin-top: 0;
     flex-wrap: wrap;
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
   }
 
   @media (max-width: 768px) {
@@ -146,5 +151,16 @@
     &__meta {
       gap: 0.75rem;
     }
+  }
+}
+
+.btn--cancel-enrollment {
+  background: #fdecea;
+  color: #c62828;
+  border-color: #f3b9b3;
+
+  &:hover:not(:disabled) {
+    background: #fbdedb;
+    border-color: #e89890;
   }
 }

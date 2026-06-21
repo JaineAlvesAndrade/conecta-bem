@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { Event } from '../models/event.model';
 import { AuthService } from './auth.service';
 import { environment } from '../../../environments/environment';
+import { EnrolledParticipant } from '../pages/event-detail/event-detail.component';
 
 export interface EventInput {
     title: string;
@@ -77,11 +78,6 @@ export class EventsService {
         };
     }
 
-    /**
-     * Busca eventos públicos (sem autenticação)
-     * GET /user/events
-     * Resposta esperada: { events: Event[], total: number }
-     */
     getPublicEvents(): Observable<Event[]> {
         return this.http.get<{ events: Event[], total: number }>(
             `${this.apiUrl}/user/events`
@@ -90,10 +86,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Cria um novo evento (requer autenticação)
-     * POST /events
-     */
     createEvent(event: EventInput): Observable<Event> {
         return this.http.post<Event>(
             `${this.apiUrl}/events`,
@@ -104,10 +96,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Atualiza um evento existente (requer autenticação)
-     * PATCH /events com id no body
-     */
     updateEvent(id: string, event: EventInput): Observable<Event> {
         return this.http.patch<Event>(
             `${this.apiUrl}/events`,
@@ -118,10 +106,6 @@ export class EventsService {
         );
     }
 
-    /**
-     * Busca evento por ID (sem autenticação)
-     * GET /user/events/:id
-     */
     getPublicEventById(id: string): Observable<Event> {
         return this.http.get<Event>(`${this.apiUrl}/user/events/${id}`).pipe(
             map(event => this.normalizeEvent(event))
@@ -136,5 +120,45 @@ export class EventsService {
         return this.http.delete(`${this.apiUrl}/events/${id}/image`, {
             headers: this.getAuthHeaders()
         });
+    }
+
+    isUserEnrolled(eventId: string): Observable<boolean> {
+        return this.http.get<{ enrolled: boolean }>(
+            `${this.apiUrl}/events/${eventId}/enrollment/status`,
+            { headers: this.getAuthHeaders() }
+        ).pipe(
+            map(response => response.enrolled)
+        );
+    }
+
+    enrollInEvent(eventId: string): Observable<any> {
+        return this.http.post(
+            `${this.apiUrl}/events/${eventId}/enroll`,
+            {},
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    getEnrolledParticipants(eventId: string): Observable<EnrolledParticipant[]> {
+        return this.http.get<EnrolledParticipant[]>(
+            `${this.apiUrl}/events/${eventId}/enrollments`,
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    getMyEnrolledEvents(): Observable<Event[]> {
+        return this.http.get<any[]>(
+            `${this.apiUrl}/user/events/enrolled`,
+            { headers: this.getAuthHeaders() }
+        ).pipe(
+            map(events => (events || []).map(event => this.normalizeEvent(event)))
+        );
+    }
+
+    cancelEnrollment(eventId: string): Observable<void> {
+        return this.http.delete<void>(
+            `${this.apiUrl}/events/${eventId}/enroll`,
+            { headers: this.getAuthHeaders() }
+        );
     }
 }
