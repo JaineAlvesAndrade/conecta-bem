@@ -42,6 +42,60 @@
                 CEP {{ event()!.address.postalCode }}
               </p>
             </div>
+
+            <!-- Enrolled participants — only visible to event owner -->
+            @if (canManageEvent()) {
+              <div class="event-detail__section event-detail__enrolled">
+                <div class="event-detail__enrolled-header">
+                  <h2>
+                    <mat-icon>group</mat-icon>
+                    Participantes inscritos
+                  </h2>
+                  <span class="event-detail__enrolled-badge">
+                    {{ enrolledParticipants().length }} / {{ event()!.capacity }}
+                  </span>
+                </div>
+
+                @if (isLoadingEnrolled()) {
+                  <div class="event-detail__enrolled-loading">
+                    <mat-icon class="spin-icon">hourglass_empty</mat-icon>
+                    <span>Carregando participantes...</span>
+                  </div>
+                } @else if (enrolledParticipants().length === 0) {
+                  <div class="event-detail__enrolled-empty">
+                    <mat-icon>person_off</mat-icon>
+                    <span>Nenhum participante inscrito ainda.</span>
+                  </div>
+                } @else {
+                  <div class="event-detail__enrolled-table-wrapper">
+                    <table class="event-detail__enrolled-table">
+                      <thead>
+                        <tr>
+                          <th>Nome</th>
+                          <th>E-mail</th>
+                          <th>CPF</th>
+                          <th>Nascimento</th>
+                          <th>Telefone</th>
+                          <th>Gênero</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (p of enrolledParticipants(); track p.id) {
+                          <tr>
+                            <td>{{ p.name }}</td>
+                            <td>{{ p.email }}</td>
+                            <td>{{ p.cpf }}</td>
+                            <td>{{ formatDate(p.birthDate) }}</td>
+                            <td>{{ p.phone }}</td>
+                            <td>{{ genderLabel(p.gender) }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+            }
           </div>
 
           <aside class="event-detail__sidebar">
@@ -56,8 +110,40 @@
             </div>
 
             <div class="event-detail__actions">
-              <button class="btn btn--outline btn--lg event-detail__back-btn" type="button" (click)="goBack()">Voltar</button>
-              <button class="btn btn--primary btn--lg event-detail__join-btn" type="button">Participar</button>
+              <button class="btn btn--outline btn--lg event-detail__back-btn" type="button" (click)="goBack()">
+                Voltar
+              </button>
+
+              <!-- Owner: no join/cancel button -->
+              @if (!canManageEvent()) {
+                @if (isEnrolled()) {
+                  <button
+                    class="btn btn--cancel-enrollment btn--lg event-detail__join-btn"
+                    type="button"
+                    [disabled]="isProcessingEnrollment()"
+                    (click)="onParticipateClick()"
+                  >
+                    @if (isProcessingEnrollment()) {
+                      <mat-icon class="spin-icon">hourglass_empty</mat-icon>
+                    } @else {
+                      <mat-icon>check_circle</mat-icon>
+                    }
+                    Cancelar inscrição
+                  </button>
+                } @else {
+                  <button
+                    class="btn btn--primary btn--lg event-detail__join-btn"
+                    type="button"
+                    [disabled]="isProcessingEnrollment()"
+                    (click)="onParticipateClick()"
+                  >
+                    @if (isProcessingEnrollment()) {
+                      <mat-icon class="spin-icon">hourglass_empty</mat-icon>
+                    }
+                    Participar
+                  </button>
+                }
+              }
             </div>
           </aside>
         </div>
@@ -65,3 +151,7 @@
     }
   </div>
 </section>
+
+@if (showLoginModal()) {
+  <app-login-required-modal (close)="closeLoginModal()" />
+}

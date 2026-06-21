@@ -1,0 +1,23 @@
+<div class="login-modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+    <button class="login-modal__close" type="button" aria-label="Fechar" (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <div class="login-modal__icon">
+      <mat-icon>lock</mat-icon>
+    </div>
+
+    <h2 id="login-modal-title">Faça login para continuar</h2>
+    <p>Você precisa estar logado para se inscrever em um evento.</p>
+
+    <div class="login-modal__actions">
+      <button class="btn btn--outline" type="button" (click)="onClose()">
+        Agora não
+      </button>
+      <button class="btn btn--primary" type="button" (click)="goToLogin()">
+        Entrar
+      </button>
+    </div>
+  </div>
+</div>

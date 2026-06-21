@@ -1,20 +1,62 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Event, EventCategory, EventCategoryLabels } from '../../models/event.model';
+import { AuthService } from '../../services/auth.service';
+import { EventsService } from '../../services/events.service';
+import { LoginRequiredModalComponent } from '../login-required-modal/login-required-modal.component';
 
 @Component({
     selector: 'app-event-card',
     standalone: true,
-    imports: [CommonModule, RouterLink, MatIconModule],
+    imports: [CommonModule, RouterLink, MatIconModule, LoginRequiredModalComponent],
     templateUrl: './event-card.component.html',
     styleUrls: ['./event-card.component.scss']
 })
-export class EventCardComponent {
+export class EventCardComponent implements OnInit, OnChanges {
     @Input() event!: Event;
     @Input() canEdit = false;
     @Output() edit = new EventEmitter<void>();
+    @Output() enrollmentChanged = new EventEmitter<void>();
+
+    showLoginModal = false;
+    isEnrolled = false;
+    isCheckingEnrollment = false;
+    isProcessingEnrollment = false;
+
+    constructor(
+        public authService: AuthService,
+        private eventsService: EventsService
+    ) {}
+
+    ngOnInit() {
+        this.refreshEnrollmentStatus();
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['event'] && !changes['event'].firstChange) {
+            this.refreshEnrollmentStatus();
+        }
+    }
+
+    private refreshEnrollmentStatus() {
+        if (!this.event || this.canEdit || !this.authService.isLoggedIn()) {
+            this.isEnrolled = false;
+            return;
+        }
+
+        this.isCheckingEnrollment = true;
+        this.eventsService.isUserEnrolled(this.event.id).subscribe({
+            next: (enrolled) => {
+                this.isEnrolled = enrolled;
+                this.isCheckingEnrollment = false;
+            },
+            error: () => {
+                this.isCheckingEnrollment = false;
+            }
+        });
+    }
 
     getImageSrc(event: Event): string {
         const rawImage = event.imageUrl || event.image;
@@ -111,5 +153,63 @@ export class EventCardComponent {
 
     onEditClick() {
         this.edit.emit();
+    }
+
+    onParticipateClick() {
+        if (this.isProcessingEnrollment) {
+            return;
+        }
+
+        if (!this.authService.isLoggedIn()) {
+            this.showLoginModal = true;
+            return;
+        }
+
+        if (this.isEnrolled) {
+            this.cancelEnrollment();
+        } else {
+            this.enroll();
+        }
+    }
+
+    private enroll() {
+        this.isProcessingEnrollment = true;
+
+        this.eventsService.enrollInEvent(this.event.id).subscribe({
+            next: () => {
+                this.isEnrolled = true;
+                this.isProcessingEnrollment = false;
+                this.event = { ...this.event, enrolledCount: (this.event.enrolledCount ?? 0) + 1 };
+                this.enrollmentChanged.emit();
+            },
+            error: (err) => {
+                console.error('Erro ao participar do evento:', err);
+                this.isProcessingEnrollment = false;
+            }
+        });
+    }
+
+    private cancelEnrollment() {
+        this.isProcessingEnrollment = true;
+
+        this.eventsService.cancelEnrollment(this.event.id).subscribe({
+            next: () => {
+                this.isEnrolled = false;
+                this.isProcessingEnrollment = false;
+                this.event = {
+                    ...this.event,
+                    enrolledCount: Math.max(0, (this.event.enrolledCount ?? 1) - 1)
+                };
+                this.enrollmentChanged.emit();
+            },
+            error: (err) => {
+                console.error('Erro ao cancelar inscrição:', err);
+                this.isProcessingEnrollment = false;
+            }
+        });
+    }
+
+    closeLoginModal() {
+        this.showLoginModal = false;
     }
 }
