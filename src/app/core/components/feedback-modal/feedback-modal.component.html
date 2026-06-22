@@ -1,0 +1,65 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
+    <button class="modal__close" type="button" aria-label="Fechar" (click)="close.emit()">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <div class="modal__icon">
+      <mat-icon>rate_review</mat-icon>
+    </div>
+
+    <h2 id="feedback-modal-title">Avaliar participação</h2>
+    @if (volunteerName) {
+      <p class="modal__subtitle">Avalie a participação de <strong>{{ volunteerName }}</strong> no evento.</p>
+    } @else {
+      <p class="modal__subtitle">Avalie a participação do voluntário no evento.</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="modal__stars" (mouseleave)="clearHover()">
+        @for (star of stars; track star) {
+          <button
+            type="button"
+            class="star-btn"
+            [class.star-btn--active]="isStarActive(star)"
+            (click)="setRating(star)"
+            (mouseenter)="setHovered(star)"
+            [attr.aria-label]="star + ' estrela' + (star > 1 ? 's' : '')"
+          >
+            <mat-icon>{{ isStarActive(star) ? 'star' : 'star_border' }}</mat-icon>
+          </button>
+        }
+      </div>
+
+      @if (currentRating > 0) {
+        <p class="modal__rating-label">
+          {{ ['', 'Muito ruim', 'Ruim', 'Regular', 'Bom', 'Excelente'][currentRating] }}
+        </p>
+      }
+
+      <div class="form-group">
+        <label for="feedback-comment">Comentário (opcional)</label>
+        <textarea
+          id="feedback-comment"
+          formControlName="comment"
+          rows="3"
+          placeholder="Descreva a experiência com este voluntário..."
+        ></textarea>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--outline btn--md" type="button" (click)="close.emit()">
+          Cancelar
+        </button>
+        <button
+          class="btn btn--primary btn--md"
+          type="submit"
+          [disabled]="currentRating === 0"
+        >
+          <mat-icon>send</mat-icon>
+          Enviar avaliação
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

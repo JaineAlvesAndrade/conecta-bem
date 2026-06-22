@@ -43,28 +43,27 @@
               </p>
             </div>
 
-            <!-- Enrolled participants — only visible to event owner -->
             @if (canManageEvent()) {
               <div class="event-detail__section event-detail__enrolled">
                 <div class="event-detail__enrolled-header">
                   <h2>
                     <mat-icon>group</mat-icon>
-                    Participantes inscritos
+                    Inscrições
                   </h2>
                   <span class="event-detail__enrolled-badge">
-                    {{ enrolledParticipants().length }} / {{ event()!.capacity }}
+                    {{ participantsWithRegistrations().length }} / {{ event()!.capacity }}
                   </span>
                 </div>
 
                 @if (isLoadingEnrolled()) {
                   <div class="event-detail__enrolled-loading">
                     <mat-icon class="spin-icon">hourglass_empty</mat-icon>
-                    <span>Carregando participantes...</span>
+                    <span>Carregando inscrições...</span>
                   </div>
-                } @else if (enrolledParticipants().length === 0) {
+                } @else if (participantsWithRegistrations().length === 0) {
                   <div class="event-detail__enrolled-empty">
                     <mat-icon>person_off</mat-icon>
-                    <span>Nenhum participante inscrito ainda.</span>
+                    <span>Nenhuma inscrição ainda.</span>
                   </div>
                 } @else {
                   <div class="event-detail__enrolled-table-wrapper">
@@ -74,20 +73,77 @@
                           <th>Nome</th>
                           <th>E-mail</th>
                           <th>CPF</th>
-                          <th>Nascimento</th>
-                          <th>Telefone</th>
-                          <th>Gênero</th>
+                          <th>Status</th>
+                          <th>Inscrito em</th>
+                          <th>Ações</th>
                         </tr>
                       </thead>
                       <tbody>
-                        @for (p of enrolledParticipants(); track p.id) {
+                        @for (p of participantsWithRegistrations(); track p.registrationId) {
                           <tr>
                             <td>{{ p.name }}</td>
-                            <td>{{ p.email }}</td>
-                            <td>{{ p.cpf }}</td>
-                            <td>{{ formatDate(p.birthDate) }}</td>
-                            <td>{{ p.phone }}</td>
-                            <td>{{ genderLabel(p.gender) }}</td>
+                            <td>{{ p.email || '—' }}</td>
+                            <td>{{ p.cpf || '—' }}</td>
+                            <td>
+                              <span
+                                class="registration-status"
+                                [class]="'registration-status--' + p.status.toLowerCase()"
+                              >
+                                {{ statusLabel(p.status) }}
+                              </span>
+                            </td>
+                            <td>{{ formatDate(p.registeredAt) }}</td>
+                            <td>
+                              <div class="event-detail__row-actions">
+                                @if (p.status === 'PENDING') {
+                                  <button
+                                    class="btn-action btn-action--confirm"
+                                    type="button"
+                                    [disabled]="processingRegistrationId() === p.registrationId"
+                                    (click)="confirmRegistration(p)"
+                                    title="Confirmar inscrição"
+                                  >
+                                    <mat-icon>check_circle</mat-icon>
+                                    Confirmar
+                                  </button>
+                                  <button
+                                    class="btn-action btn-action--reject"
+                                    type="button"
+                                    [disabled]="processingRegistrationId() === p.registrationId"
+                                    (click)="openRejectModal(p)"
+                                    title="Recusar inscrição"
+                                  >
+                                    <mat-icon>block</mat-icon>
+                                    Recusar
+                                  </button>
+                                }
+                                @if (canGiveFeedback(p)) {
+                                  <button
+                                    class="btn-action btn-action--feedback"
+                                    type="button"
+                                    [disabled]="processingRegistrationId() === p.registrationId"
+                                    (click)="openFeedbackModal(p)"
+                                    title="Avaliar participação"
+                                  >
+                                    <mat-icon>rate_review</mat-icon>
+                                    Avaliar
+                                  </button>
+                                }
+                                @if (p.organizerFeedback) {
+                                  <span class="feedback-sent-label" [title]="p.organizerFeedback">
+                                    <mat-icon>star</mat-icon>
+                                    {{ p.feedbackRating }}/5
+                                  </span>
+                                }
+                                @if (p.status === 'PENDING' || p.status === 'CONFIRMED') {
+                                } @else if (p.status === 'REJECTED' && p.justification) {
+                                  <span class="justification-label" [title]="p.justification">
+                                    <mat-icon>info_outline</mat-icon>
+                                    Justificado
+                                  </span>
+                                }
+                              </div>
+                            </td>
                           </tr>
                         }
                       </tbody>
@@ -114,7 +170,6 @@
                 Voltar
               </button>
 
-              <!-- Owner: no join/cancel button -->
               @if (!canManageEvent()) {
                 @if (isEnrolled()) {
                   <button
@@ -146,4 +201,20 @@
 
 @if (showLoginModal()) {
   <app-login-required-modal (close)="closeLoginModal()" />
+}
+
+@if (activeFeedbackParticipant()) {
+  <app-feedback-modal
+    [volunteerName]="activeFeedbackParticipant()!.name"
+    (submitFeedback)="onFeedbackSubmit($event)"
+    (close)="closeFeedbackModal()"
+  />
+}
+
+@if (activeRejectParticipant()) {
+  <app-reject-modal
+    [volunteerName]="activeRejectParticipant()!.name"
+    (confirm)="onRejectConfirm($event)"
+    (close)="closeRejectModal()"
+  />
 }

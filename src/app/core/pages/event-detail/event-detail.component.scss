@@ -291,6 +291,133 @@
   }
 }
 
+.registration-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &--pending {
+    background: #fff8e1;
+    color: #e65100;
+    border: 1px solid #ffe0b2;
+  }
+
+  &--confirmed {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+  }
+
+  &--rejected {
+    background: #fdecea;
+    color: #c62828;
+    border: 1px solid #f3b9b3;
+  }
+
+  &--dismissed {
+    background: #f5f5f5;
+    color: #757575;
+    border: 1px solid #e0e0e0;
+  }
+}
+
+.event-detail__row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &--confirm {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #c8e6c9;
+
+    &:hover:not(:disabled) {
+      background: #c8e6c9;
+    }
+  }
+
+  &--reject {
+    background: #fdecea;
+    color: #c62828;
+    border-color: #f3b9b3;
+
+    &:hover:not(:disabled) {
+      background: #f3b9b3;
+    }
+  }
+
+  &--feedback {
+    background: #fff8e1;
+    color: #e65100;
+    border-color: #ffe0b2;
+
+    &:hover:not(:disabled) {
+      background: #ffe0b2;
+    }
+  }
+}
+
+.feedback-sent-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: #f59e0b;
+  font-weight: 600;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.justification-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  cursor: help;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
 .btn--enrolled,
 .btn--cancel-enrollment {
   background: #fdecea;

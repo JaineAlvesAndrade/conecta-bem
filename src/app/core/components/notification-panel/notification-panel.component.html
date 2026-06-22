@@ -1,0 +1,39 @@
+<div class="notif-panel">
+  <div class="notif-panel__header">
+    <span class="notif-panel__title">Notificações</span>
+    @if (notificationService.unreadCount() > 0) {
+      <button class="notif-panel__mark-all" type="button" (click)="onMarkAllRead()">
+        Marcar todas como lidas
+      </button>
+    }
+  </div>
+
+  @if (notificationService.notifications().length === 0) {
+    <div class="notif-panel__empty">
+      <mat-icon>notifications_none</mat-icon>
+      <p>Nenhuma notificação</p>
+    </div>
+  } @else {
+    <ul class="notif-panel__list">
+      @for (notif of notificationService.notifications(); track notif.id) {
+        <li
+          class="notif-panel__item"
+          [class.notif-panel__item--unread]="!notif.read"
+          (click)="onNotificationClick(notif)"
+        >
+          <div class="notif-panel__item-icon" [class.notif-panel__item-icon--enrollment]="notif.type === 'pending_enrollment'">
+            <mat-icon>{{ typeIcon(notif.type) }}</mat-icon>
+          </div>
+          <div class="notif-panel__item-content">
+            <p class="notif-panel__item-title">{{ notif.title }}</p>
+            <p class="notif-panel__item-msg">{{ notif.message }}</p>
+            <span class="notif-panel__item-time">{{ formatTime(notif.timestamp) }}</span>
+          </div>
+          @if (!notif.read) {
+            <span class="notif-panel__item-dot" aria-label="Não lida"></span>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>
