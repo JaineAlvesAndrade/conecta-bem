@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, Input, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { EventsService, EventInput } from '../../services/events.service';
 import { AddressService } from '../../services/address.service';
 import { Event, EventCategory, EventCategoryLabels } from '../../models/event.model';
@@ -58,6 +59,8 @@ export class CreateEventModalComponent implements OnInit {
       startsAt: ['', Validators.required],
       endsAt: ['', Validators.required],
       capacity: ['', [Validators.required, Validators.min(1)]]
+    }, {
+      validators: [this.dateRangeValidator]
     });
 
     this.addressForm = this.fb.group({
@@ -118,7 +121,10 @@ export class CreateEventModalComponent implements OnInit {
 
     if (type === 'ORGANIZATION') {
       organizationName?.setValidators([Validators.required, Validators.minLength(3)]);
-      organizationDocument?.setValidators([Validators.required, Validators.minLength(11)]);
+      organizationDocument?.setValidators([
+        Validators.required,
+        Validators.pattern(/^(\d{14}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})$/)
+      ]);
     } else {
       organizationName?.clearValidators();
       organizationDocument?.clearValidators();
@@ -271,6 +277,7 @@ export class CreateEventModalComponent implements OnInit {
 
   onSubmit() {
     if (this.eventForm.invalid) {
+      this.eventForm.markAllAsTouched();
       this.error.set('Preencha todos os campos corretamente');
       return;
     }
@@ -279,19 +286,29 @@ export class CreateEventModalComponent implements OnInit {
     this.error.set(null);
 
     const formValue = this.eventForm.value;
+    const startsAt = this.formatDateForBackend(formValue.startsAt);
+    const endsAt = this.formatDateForBackend(formValue.endsAt);
+    const capacity = Number(formValue.capacity);
+
+    if (!startsAt || !endsAt || !Number.isInteger(capacity) || capacity < 1) {
+      this.error.set('Revise data, horario e quantidade de vagas antes de salvar.');
+      this.isSubmitting.set(false);
+      return;
+    }
+
     const eventData: EventInput = {
-      title: formValue.title,
-      description: formValue.description,
+      title: formValue.title?.trim(),
+      description: formValue.description?.trim(),
       addressId: formValue.addressId,
       category: formValue.category,
       type: formValue.type,
-      organizationName: formValue.type === 'ORGANIZATION' ? formValue.organizationName : null,
+      organizationName: formValue.type === 'ORGANIZATION' ? formValue.organizationName?.trim() : null,
       organizationDocument: formValue.type === 'ORGANIZATION'
         ? this.stripMask(formValue.organizationDocument || '')
         : null,
-      startsAt: new Date(formValue.startsAt).toISOString().slice(0, 19),
-      endsAt: new Date(formValue.endsAt).toISOString().slice(0, 19),
-      capacity: parseInt(formValue.capacity, 10),
+      startsAt,
+      endsAt,
+      capacity,
       image: this.selectedImage()
     };
 
@@ -313,7 +330,10 @@ export class CreateEventModalComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao salvar evento:', err);
-        this.error.set(this.isEditMode ? 'Falha ao atualizar evento. Tente novamente.' : 'Falha ao criar evento. Tente novamente.');
+        const fallback = this.isEditMode
+          ? 'Falha ao atualizar evento. Tente novamente.'
+          : 'Falha ao criar evento. Tente novamente.';
+        this.error.set(this.extractErrorMessage(err, fallback));
         this.isSubmitting.set(false);
       }
     });
@@ -334,12 +354,18 @@ export class CreateEventModalComponent implements OnInit {
 
   getFieldError(fieldName: string, form: FormGroup = this.eventForm): string | null {
     const field = form.get(fieldName);
+    if (fieldName === 'endsAt' && field?.touched && this.eventForm.errors?.['dateRange']) {
+      return 'O termino deve ser depois do inicio';
+    }
     if (!field || !field.errors || !field.touched) return null;
 
     if (field.errors['required']) return 'Este campo é obrigatório';
     if (field.errors['minlength']) return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
     if (field.errors['min']) return `Mínimo ${field.errors['min'].min}`;
 
+    if (field.errors['pattern']) return fieldName === 'organizationDocument'
+      ? 'Informe um CNPJ com 14 digitos'
+      : 'Formato invalido';
     return null;
   }
 
@@ -366,5 +392,88 @@ export class CreateEventModalComponent implements OnInit {
 
   private stripMask(value: string): string {
     return value.replace(/\D/g, '');
+  }
+
+  private formatDateForBackend(value: string): string | null {
+    if (!value || Number.isNaN(new Date(value).getTime())) {
+      return null;
+    }
+
+    return value.length === 16 ? `${value}:00` : value.slice(0, 19);
+  }
+
+  private dateRangeValidator(control: AbstractControl): ValidationErrors | null {
+    const startsAt = control.get('startsAt')?.value;
+    const endsAt = control.get('endsAt')?.value;
+
+    if (!startsAt || !endsAt) {
+      return null;
+    }
+
+    const start = new Date(startsAt).getTime();
+    const end = new Date(endsAt).getTime();
+
+    if (Number.isNaN(start) || Number.isNaN(end)) {
+      return { invalidDate: true };
+    }
+
+    return end <= start ? { dateRange: true } : null;
+  }
+
+  private extractErrorMessage(err: unknown, fallback: string): string {
+    if (!(err instanceof HttpErrorResponse)) {
+      return fallback;
+    }
+
+    const body = err.error;
+    if (typeof body === 'string' && body.trim()) {
+      return body;
+    }
+
+    if (body && typeof body === 'object') {
+      const errorBody = body as Record<string, unknown>;
+      const rawMessage = String(errorBody['message'] || errorBody['error'] || errorBody['details'] || '').trim();
+      const knownMessage = this.translateBackendMessage(rawMessage);
+
+      if (knownMessage) {
+        return knownMessage;
+      }
+
+      const fieldMessages = Object.values(errorBody)
+        .filter(value => typeof value === 'string' && value.trim())
+        .map(value => String(value));
+
+      if (fieldMessages.length) {
+        return fieldMessages.join(' ');
+      }
+    }
+
+    return fallback;
+  }
+
+  private translateBackendMessage(message: string): string | null {
+    if (!message) return null;
+    if (message.includes('Complete your profile')) {
+      return 'Complete seu perfil antes de criar um evento. Campos obrigatorios: nome, e-mail, CPF/CNPJ e telefone.';
+    }
+    if (message.includes('Organization events require')) {
+      return 'Eventos de organizacao precisam de nome da organizacao e CNPJ.';
+    }
+    if (message.includes('Event end date must be after start date')) {
+      return 'A data de termino deve ser depois da data de inicio.';
+    }
+    if (message.includes('Event start date must be in the future')) {
+      return 'A data de inicio deve ser futura.';
+    }
+    if (message.includes('capacity')) {
+      return 'Informe uma quantidade de vagas maior que zero.';
+    }
+    if (message.includes('address')) {
+      return 'Selecione um endereco valido para o evento.';
+    }
+    if (message.includes('Uploaded file must be an image')) {
+      return 'A imagem enviada precisa estar em um formato de imagem valido.';
+    }
+    return message;
   }
 }
