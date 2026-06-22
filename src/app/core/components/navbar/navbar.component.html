@@ -21,7 +21,24 @@
 
     <div class="navbar__actions">
       @if (authService.isLoggedIn()) {
-        <!-- Usuário logado -->
+        <div class="navbar__notif" [class.navbar__notif--open]="notifPanelOpen">
+          <button
+            class="navbar__notif-btn"
+            (click)="toggleNotifPanel()"
+            aria-label="Notificações"
+          >
+            <mat-icon>notifications</mat-icon>
+            @if (notificationService.unreadCount() > 0) {
+              <span class="navbar__notif-badge">
+                {{ notificationService.unreadCount() > 9 ? '9+' : notificationService.unreadCount() }}
+              </span>
+            }
+          </button>
+          @if (notifPanelOpen) {
+            <app-notification-panel (close)="closeNotifPanel()" />
+          }
+        </div>
+
         <div class="navbar__user" [class.navbar__user--open]="userMenuOpen" (clickOutside)="closeUserMenu()">
           <button class="navbar__user-btn" (click)="toggleUserMenu()" aria-label="Menu do usuário">
             <mat-icon>person</mat-icon>
@@ -43,7 +60,6 @@
           </div>
         </div>
       } @else {
-        <!-- Não logado -->
         <a (click)="goToLogin()" class="navbar__link">Entrar</a>
         <a (click)="goToSubscription()" class="btn btn--primary btn--sm">
           Cadastre-se

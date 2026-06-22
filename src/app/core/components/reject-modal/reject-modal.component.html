@@ -1,0 +1,42 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reject-modal-title">
+    <button class="modal__close" type="button" aria-label="Fechar" (click)="close.emit()">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <div class="modal__icon">
+      <mat-icon>person_remove</mat-icon>
+    </div>
+
+    <h2 id="reject-modal-title">Recusar inscrição</h2>
+    @if (volunteerName) {
+      <p class="modal__subtitle">
+        Tem certeza que deseja recusar a inscrição de <strong>{{ volunteerName }}</strong>?
+      </p>
+    } @else {
+      <p class="modal__subtitle">Tem certeza que deseja recusar esta inscrição?</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onConfirm()">
+      <div class="form-group">
+        <label for="reject-justification">Justificativa (opcional)</label>
+        <textarea
+          id="reject-justification"
+          formControlName="justification"
+          rows="3"
+          placeholder="Informe o motivo da recusa para o voluntário..."
+        ></textarea>
+      </div>
+
+      <div class="modal__actions">
+        <button class="btn btn--outline btn--md" type="button" (click)="close.emit()">
+          Cancelar
+        </button>
+        <button class="btn btn--danger btn--md" type="submit">
+          <mat-icon>block</mat-icon>
+          Recusar inscrição
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
