@@ -168,9 +168,29 @@
 
   &__actions {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: stretch;
     gap: 1rem;
+  }
+
+  &__notice {
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+
+    &--success {
+      background: #ecfdf3;
+      border-color: #b7ebc6;
+      color: #166534;
+    }
+
+    &--error {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
   }
 
   &__back-btn,
@@ -289,6 +309,13 @@
       }
     }
   }
+
+  &__participant-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    min-width: 230px;
+  }
 }
 
 .btn--enrolled,
@@ -310,6 +337,12 @@
 
 .spin-icon {
   animation: spin 1s linear infinite;
+}
+
+.btn--xs {
+  padding: 0.35rem 0.55rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
 }
 
 @keyframes spin {

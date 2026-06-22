@@ -196,7 +196,39 @@
           <span class="form-error">{{ getFieldError('category', eventForm) }}</span>
           }
         </div>
+
+        <div class="form-group">
+          <label for="type">Tipo de evento *</label>
+          <select id="type" formControlName="type" class="form-input">
+            <option value="COMMUNITY">ComunitÃ¡rio</option>
+            <option value="ORGANIZATION">OrganizaÃ§Ã£o</option>
+          </select>
+        </div>
       </div>
+
+      @if (isOrganizationEvent) {
+      <div class="form-row">
+        <div class="form-group">
+          <label for="organizationName">Nome da organizaÃ§Ã£o *</label>
+          <input id="organizationName" type="text" formControlName="organizationName"
+            placeholder="Ex: Instituto Bem" class="form-input"
+            [class.form-input--error]="eventForm.get('organizationName')?.invalid && eventForm.get('organizationName')?.touched" />
+          @if (getFieldError('organizationName', eventForm)) {
+          <span class="form-error">{{ getFieldError('organizationName', eventForm) }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="organizationDocument">CNPJ da organizaÃ§Ã£o *</label>
+          <input id="organizationDocument" type="text" formControlName="organizationDocument"
+            placeholder="00.000.000/0000-00" class="form-input" (input)="onOrganizationDocumentInput()"
+            [class.form-input--error]="eventForm.get('organizationDocument')?.invalid && eventForm.get('organizationDocument')?.touched" />
+          @if (getFieldError('organizationDocument', eventForm)) {
+          <span class="form-error">{{ getFieldError('organizationDocument', eventForm) }}</span>
+          }
+        </div>
+      </div>
+      }
 
       <div class="form-row">
         <!-- Starts At -->

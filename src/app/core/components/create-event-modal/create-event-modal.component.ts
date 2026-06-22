@@ -6,6 +6,7 @@ import { AddressService } from '../../services/address.service';
 import { Event, EventCategory, EventCategoryLabels } from '../../models/event.model';
 import { Address } from '../../models/address.model';
 import { MatIconModule } from '@angular/material/icon';
+import { NotificationsService } from '../../services/notifications.service';
 
 @Component({
   selector: 'app-create-event-modal',
@@ -43,13 +44,17 @@ export class CreateEventModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private eventsService: EventsService,
-    private addressService: AddressService
+    private addressService: AddressService,
+    private notificationsService: NotificationsService
   ) {
     this.eventForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5)]],
       description: ['', [Validators.required, Validators.minLength(20)]],
       addressId: ['', Validators.required],
       category: [EventCategory.SOCIAL, Validators.required],
+      type: ['COMMUNITY', Validators.required],
+      organizationName: [''],
+      organizationDocument: [''],
       startsAt: ['', Validators.required],
       endsAt: ['', Validators.required],
       capacity: ['', [Validators.required, Validators.min(1)]]
@@ -71,6 +76,7 @@ export class CreateEventModalComponent implements OnInit {
   ngOnInit() {
     this.loadAddresses();
     this.prefillFormIfEditing();
+    this.configureEventTypeValidation();
   }
 
   get isEditMode(): boolean {
@@ -87,12 +93,41 @@ export class CreateEventModalComponent implements OnInit {
       description: this.eventToEdit.description,
       addressId: this.eventToEdit.address?.id || '',
       category: this.eventToEdit.category,
+      type: this.eventToEdit.type || 'COMMUNITY',
+      organizationName: this.eventToEdit.organizationName || '',
+      organizationDocument: this.eventToEdit.organizationDocument || '',
       startsAt: this.formatDateForInput(this.eventToEdit.startsAt),
       endsAt: this.formatDateForInput(this.eventToEdit.endsAt),
       capacity: this.eventToEdit.capacity
     });
 
     this.imagePreview.set(this.eventToEdit.imageUrl || this.eventToEdit.image || '/assets/no_image.png');
+  }
+
+  private configureEventTypeValidation() {
+    this.eventForm.get('type')?.valueChanges.subscribe((type) => {
+      this.applyEventTypeValidation(type);
+    });
+
+    this.applyEventTypeValidation(this.eventForm.get('type')?.value);
+  }
+
+  private applyEventTypeValidation(type: string) {
+    const organizationName = this.eventForm.get('organizationName');
+    const organizationDocument = this.eventForm.get('organizationDocument');
+
+    if (type === 'ORGANIZATION') {
+      organizationName?.setValidators([Validators.required, Validators.minLength(3)]);
+      organizationDocument?.setValidators([Validators.required, Validators.minLength(11)]);
+    } else {
+      organizationName?.clearValidators();
+      organizationDocument?.clearValidators();
+      organizationName?.setValue('', { emitEvent: false });
+      organizationDocument?.setValue('', { emitEvent: false });
+    }
+
+    organizationName?.updateValueAndValidity({ emitEvent: false });
+    organizationDocument?.updateValueAndValidity({ emitEvent: false });
   }
 
   private formatDateForInput(dateValue: string): string {
@@ -249,6 +284,11 @@ export class CreateEventModalComponent implements OnInit {
       description: formValue.description,
       addressId: formValue.addressId,
       category: formValue.category,
+      type: formValue.type,
+      organizationName: formValue.type === 'ORGANIZATION' ? formValue.organizationName : null,
+      organizationDocument: formValue.type === 'ORGANIZATION'
+        ? this.stripMask(formValue.organizationDocument || '')
+        : null,
       startsAt: new Date(formValue.startsAt).toISOString().slice(0, 19),
       endsAt: new Date(formValue.endsAt).toISOString().slice(0, 19),
       capacity: parseInt(formValue.capacity, 10),
@@ -264,8 +304,10 @@ export class CreateEventModalComponent implements OnInit {
         this.isSubmitting.set(false);
         if (this.isEditMode) {
           this.eventUpdated.emit(savedEvent);
+          this.notificationsService.add('Evento atualizado', 'As alteracoes do evento foram salvas.', 'success');
         } else {
           this.eventCreated.emit(savedEvent);
+          this.notificationsService.add('Evento criado', 'O evento foi criado e ja esta disponivel para inscricoes.', 'success');
         }
         this.closeModal();
       },
@@ -278,7 +320,7 @@ export class CreateEventModalComponent implements OnInit {
   }
 
   closeModal() {
-    this.eventForm.reset({ category: EventCategory.SOCIAL });
+    this.eventForm.reset({ category: EventCategory.SOCIAL, type: 'COMMUNITY' });
     this.addressForm.reset({ country: 'Brasil' });
     this.error.set(null);
     this.addressError.set(null);
@@ -303,5 +345,26 @@ export class CreateEventModalComponent implements OnInit {
 
   getAddressLabel(address: Address): string {
     return `${address.street}, ${address.number} - ${address.city}, ${address.state}`;
+  }
+
+  get isOrganizationEvent(): boolean {
+    return this.eventForm.get('type')?.value === 'ORGANIZATION';
+  }
+
+  onOrganizationDocumentInput() {
+    const control = this.eventForm.get('organizationDocument');
+    if (!control) return;
+
+    const digits = this.stripMask(control.value || '').slice(0, 14);
+    const formatted = digits
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+    control.setValue(formatted, { emitEvent: false });
+  }
+
+  private stripMask(value: string): string {
+    return value.replace(/\D/g, '');
   }
 }

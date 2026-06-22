@@ -15,7 +15,19 @@ export interface EventInput {
     startsAt: string;
     endsAt: string;
     capacity: number;
+    type?: 'COMMUNITY' | 'ORGANIZATION';
+    organizationName?: string | null;
+    organizationDocument?: string | null;
     image?: File | null;
+}
+
+export interface EventRegistrationActionRequest {
+    justification?: string | null;
+}
+
+export interface OrganizerFeedbackRequest {
+    rating?: number | null;
+    comment?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -44,7 +56,10 @@ export class EventsService {
             category: event.category,
             startsAt: event.startsAt,
             endsAt: event.endsAt,
-            capacity: event.capacity
+            capacity: event.capacity,
+            type: event.type || 'COMMUNITY',
+            organizationName: event.organizationName || null,
+            organizationDocument: event.organizationDocument || null
         };
 
         if (id) {
@@ -158,6 +173,38 @@ export class EventsService {
     cancelEnrollment(eventId: string): Observable<void> {
         return this.http.delete<void>(
             `${this.apiUrl}/events/${eventId}/enroll`,
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    notifyAbsence(eventId: string, justification: string): Observable<any> {
+        return this.http.patch(
+            `${this.apiUrl}/events/${eventId}/absence-notice`,
+            { justification },
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    rejectRegistration(registrationId: string, request: EventRegistrationActionRequest): Observable<any> {
+        return this.http.patch(
+            `${this.apiUrl}/event-registrations/${registrationId}/reject`,
+            request,
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    dismissRegistration(registrationId: string, request: EventRegistrationActionRequest): Observable<any> {
+        return this.http.patch(
+            `${this.apiUrl}/event-registrations/${registrationId}/dismiss`,
+            request,
+            { headers: this.getAuthHeaders() }
+        );
+    }
+
+    addOrganizerFeedback(registrationId: string, request: OrganizerFeedbackRequest): Observable<any> {
+        return this.http.post(
+            `${this.apiUrl}/event-registrations/${registrationId}/organizer-feedback`,
+            request,
             { headers: this.getAuthHeaders() }
         );
     }

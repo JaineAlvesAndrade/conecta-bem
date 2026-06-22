@@ -5,9 +5,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { Event, EventCategoryLabels } from '../../models/event.model';
 import { AuthService } from '../../services/auth.service';
 import { EventsService } from '../../services/events.service';
+import { NotificationsService } from '../../services/notifications.service';
 import { LoginRequiredModalComponent } from '../../components/login-required-modal/login-required-modal.component';
 
 export interface EnrolledParticipant {
+  registrationId: string;
   id: string;
   name: string;
   email: string;
@@ -15,6 +17,7 @@ export interface EnrolledParticipant {
   birthDate: string;
   phone: string;
   gender: 'MALE' | 'FEMALE' | 'OTHER' | string;
+  status?: string;
 }
 
 @Component({
@@ -35,11 +38,15 @@ export class EventDetailComponent implements OnInit {
   isEnrolled = signal(false);
   isProcessingEnrollment = signal(false);
   showLoginModal = signal(false);
+  actionMessage = signal<string | null>(null);
+  actionError = signal<string | null>(null);
+  processingRegistrationId = signal<string | null>(null);
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private eventsService: EventsService,
+    private notificationsService: NotificationsService,
     public authService: AuthService
   ) {}
 
@@ -171,6 +178,110 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
+  notifyAbsence() {
+    const event = this.event();
+    if (!event || this.isProcessingEnrollment()) return;
+
+    const justification = window.prompt('Informe o motivo da ausencia:');
+    if (!justification || !justification.trim()) return;
+
+    this.isProcessingEnrollment.set(true);
+    this.actionError.set(null);
+    this.actionMessage.set(null);
+
+    this.eventsService.notifyAbsence(event.id, justification.trim()).subscribe({
+      next: () => {
+        this.isProcessingEnrollment.set(false);
+        this.isEnrolled.set(false);
+        this.actionMessage.set('Aviso de ausencia registrado.');
+        this.notificationsService.add('Aviso de ausencia', 'Seu aviso de ausencia foi registrado no evento.', 'success');
+      },
+      error: (err) => {
+        console.error('Erro ao avisar ausencia:', err);
+        this.isProcessingEnrollment.set(false);
+        this.actionError.set('Nao foi possivel registrar o aviso de ausencia.');
+      }
+    });
+  }
+
+  rejectParticipant(participant: EnrolledParticipant) {
+    const justification = window.prompt('Informe o motivo da recusa:', 'Perfil nao aderente a acao');
+    if (!justification || !justification.trim()) return;
+
+    this.runParticipantAction(
+      participant,
+      () => this.eventsService.rejectRegistration(participant.registrationId, { justification: justification.trim() }),
+      'Inscricao recusada.'
+    );
+  }
+
+  dismissParticipant(participant: EnrolledParticipant) {
+    const justification = window.prompt('Informe o motivo da dispensa:', 'Equipe completa');
+    if (!justification || !justification.trim()) return;
+
+    this.runParticipantAction(
+      participant,
+      () => this.eventsService.dismissRegistration(participant.registrationId, { justification: justification.trim() }),
+      'Participante dispensado.'
+    );
+  }
+
+  addFeedback(participant: EnrolledParticipant) {
+    const ratingText = window.prompt('Nota do participante (1 a 5):', '5');
+    if (!ratingText) return;
+
+    const rating = Number(ratingText);
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      this.actionError.set('A nota deve ser um numero entre 1 e 5.');
+      return;
+    }
+
+    const comment = window.prompt('Comentario do organizador:', 'Participacao registrada no evento');
+    this.runParticipantAction(
+      participant,
+      () => this.eventsService.addOrganizerFeedback(participant.registrationId, {
+        rating,
+        comment: comment?.trim() || null
+      }),
+      'Feedback registrado.',
+      false
+    );
+  }
+
+  private runParticipantAction(
+    participant: EnrolledParticipant,
+    requestFactory: () => any,
+    successMessage: string,
+    removeFromActiveList = true
+  ) {
+    if (this.processingRegistrationId()) return;
+
+    this.processingRegistrationId.set(participant.registrationId);
+    this.actionError.set(null);
+    this.actionMessage.set(null);
+
+    requestFactory().subscribe({
+      next: () => {
+        this.processingRegistrationId.set(null);
+        this.actionMessage.set(successMessage);
+        this.notificationsService.add('Acao concluida', successMessage, 'success');
+        const event = this.event();
+        if (event && removeFromActiveList) {
+          this.loadEnrolledParticipants(event.id);
+          this.event.set({
+            ...event,
+            enrolledCount: Math.max(0, (event.enrolledCount ?? 1) - 1)
+          });
+        }
+      },
+      error: (err: unknown) => {
+        console.error('Erro ao gerenciar participante:', err);
+        this.processingRegistrationId.set(null);
+        this.actionError.set('Nao foi possivel concluir a acao.');
+      }
+    });
+  }
+
   get categoryLabel(): string {
     const event = this.event();
     return event ? EventCategoryLabels[event.category] : '';
@@ -202,6 +313,22 @@ export class EventDetailComponent implements OnInit {
       OTHER: 'Outro'
     };
     return map[gender] ?? gender;
+  }
+
+  statusLabel(status?: string): string {
+    const map: Record<string, string> = {
+      REGISTERED: 'Inscrito',
+      PENDING: 'Pendente',
+      CONFIRMED: 'Confirmado',
+      PRESENT: 'Presente',
+      JUSTIFIED: 'Justificado'
+    };
+    return status ? map[status] ?? status : 'Inscrito';
+  }
+
+  isEventEnded(): boolean {
+    const event = this.event();
+    return !!event?.endsAt && new Date(event.endsAt).getTime() < Date.now();
   }
 
   canManageEvent(): boolean {

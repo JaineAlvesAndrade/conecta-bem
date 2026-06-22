@@ -35,6 +35,13 @@
               <mat-icon>history</mat-icon>
               Histórico de eventos
             </a>
+            <a class="navbar__dropdown-item" (click)="goToNotifications()">
+              <mat-icon>notifications</mat-icon>
+              Notificacoes
+              @if (notificationsService.unreadCount()) {
+                <span class="navbar__badge">{{ notificationsService.unreadCount() }}</span>
+              }
+            </a>
             <div class="navbar__dropdown-divider"></div>
             <a class="navbar__dropdown-item navbar__dropdown-item--danger" (click)="logout()">
               <mat-icon>logout</mat-icon>

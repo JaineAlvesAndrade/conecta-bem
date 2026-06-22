@@ -31,4 +31,7 @@ export interface Event {
   enrolledCount?: number;
   image?: string;
   imageUrl?: string;
+  type?: 'COMMUNITY' | 'ORGANIZATION';
+  organizationName?: string | null;
+  organizationDocument?: string | null;
 }

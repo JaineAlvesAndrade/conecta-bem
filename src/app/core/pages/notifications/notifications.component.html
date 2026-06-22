@@ -1,0 +1,39 @@
+<main class="notifications-page">
+  <section class="notifications-page__header">
+    <div>
+      <span class="eyebrow">Central</span>
+      <h1>Notificacoes</h1>
+    </div>
+    @if (notificationsService.items().length) {
+      <button type="button" class="btn btn--outline btn--sm" (click)="notificationsService.clear()">
+        Limpar
+      </button>
+    }
+  </section>
+
+  @if (notificationsService.items().length) {
+    <section class="notifications-page__list">
+      @for (item of notificationsService.items(); track item.id) {
+        <article class="notification" [class.notification--success]="item.type === 'success'"
+          [class.notification--warning]="item.type === 'warning'">
+          <mat-icon>{{ item.type === 'success' ? 'check_circle' : item.type === 'warning' ? 'warning' : 'notifications' }}</mat-icon>
+          <div>
+            <div class="notification__title">{{ item.title }}</div>
+            <p>{{ item.message }}</p>
+            <time>{{ formatDate(item.createdAt) }}</time>
+          </div>
+          <button type="button" class="notification__remove" aria-label="Remover notificacao"
+            (click)="notificationsService.remove(item.id)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </article>
+      }
+    </section>
+  } @else {
+    <section class="notifications-page__empty">
+      <mat-icon>notifications_none</mat-icon>
+      <h2>Nenhuma notificacao</h2>
+      <a routerLink="/eventos" class="btn btn--primary btn--sm">Explorar eventos</a>
+    </section>
+  }
+</main>

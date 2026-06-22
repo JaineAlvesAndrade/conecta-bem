@@ -34,6 +34,14 @@
               <p>{{ event()!.description }}</p>
             </div>
 
+            @if (actionMessage()) {
+              <div class="event-detail__notice event-detail__notice--success">{{ actionMessage() }}</div>
+            }
+
+            @if (actionError()) {
+              <div class="event-detail__notice event-detail__notice--error">{{ actionError() }}</div>
+            }
+
             <div class="event-detail__section" *ngIf="event()!.address">
               <h2>Localização</h2>
               <p>
@@ -76,17 +84,39 @@
                           <th>CPF</th>
                           <th>Nascimento</th>
                           <th>Telefone</th>
+                          <th>Status</th>
+                          <th>Acoes</th>
                           <th>Gênero</th>
                         </tr>
                       </thead>
                       <tbody>
-                        @for (p of enrolledParticipants(); track p.id) {
+                        @for (p of enrolledParticipants(); track p.registrationId) {
                           <tr>
                             <td>{{ p.name }}</td>
                             <td>{{ p.email }}</td>
                             <td>{{ p.cpf }}</td>
                             <td>{{ formatDate(p.birthDate) }}</td>
                             <td>{{ p.phone }}</td>
+                            <td>{{ statusLabel(p.status) }}</td>
+                            <td>
+                              <div class="event-detail__participant-actions">
+                                <button type="button" class="btn btn--outline btn--xs"
+                                  [disabled]="processingRegistrationId() === p.registrationId"
+                                  (click)="rejectParticipant(p)">
+                                  Recusar
+                                </button>
+                                <button type="button" class="btn btn--outline btn--xs"
+                                  [disabled]="processingRegistrationId() === p.registrationId"
+                                  (click)="dismissParticipant(p)">
+                                  Dispensar
+                                </button>
+                                <button type="button" class="btn btn--outline btn--xs"
+                                  [disabled]="processingRegistrationId() === p.registrationId || !isEventEnded()"
+                                  (click)="addFeedback(p)">
+                                  Feedback
+                                </button>
+                              </div>
+                            </td>
                             <td>{{ genderLabel(p.gender) }}</td>
                           </tr>
                         }
@@ -124,6 +154,14 @@
                     (click)="onParticipateClick()"
                   >
                     {{ isProcessingEnrollment() ? 'Cancelando...' : 'Cancelar inscrição' }}
+                  </button>
+                  <button
+                    class="btn btn--outline btn--lg event-detail__join-btn"
+                    type="button"
+                    [disabled]="isProcessingEnrollment()"
+                    (click)="notifyAbsence()"
+                  >
+                    Avisar ausencia
                   </button>
                 } @else {
                   <button

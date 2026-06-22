@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { NotificationsService } from '../../services/notifications.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,6 +18,7 @@ export class NavbarComponent {
 
   constructor(
     public authService: AuthService,
+    public notificationsService: NotificationsService,
     private router: Router
   ) {}
 
@@ -55,6 +57,11 @@ export class NavbarComponent {
   goToHistory() {
     this.userMenuOpen = false;
     this.router.navigate(['/historico-eventos']);
+  }
+
+  goToNotifications() {
+    this.userMenuOpen = false;
+    this.router.navigate(['/notificacoes']);
   }
 
   goToLogin() {

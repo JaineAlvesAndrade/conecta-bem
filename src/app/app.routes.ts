@@ -7,6 +7,7 @@ import { ChangePasswordComponent } from './core/pages/change-password/change-pas
 import { ProfileComponent } from './core/pages/profile/profile.component';
 import { AboutUsComponent } from './core/pages/about-us/about-us.component';
 import { EventHistoryComponent } from './core/pages/event-history/event-history.component';
+import { NotificationsComponent } from './core/pages/notifications/notifications.component';
 
 export const routes: Routes = [
     { path: 'login', component: AuthComponent, data: { mode: 'login' } },
@@ -38,5 +39,9 @@ export const routes: Routes = [
     {
         path: 'historico-eventos',
         component: EventHistoryComponent
+    },
+    {
+        path: 'notificacoes',
+        component: NotificationsComponent
     }
 ];
